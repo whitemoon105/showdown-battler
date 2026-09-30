@@ -19,7 +19,7 @@ const out=process.env.SHOWDOWN_TEST_OUTPUT||path.resolve('test-results/0.5.7'),s
   const selectedColor=await run("getComputedStyle(document.querySelector('[data-order-slot=\"0\"]')).backgroundColor");assert.notEqual(selectedColor,await run("getComputedStyle(document.querySelector('[data-order-slot=\"1\"]')).backgroundColor"),'active position must be visibly highlighted');
   for(const [slot,mon]of [[2,4],[0,0],[1,1],[3,3]]){await run(`document.querySelector('[data-order-slot="${slot}"]').click();document.querySelector('.dfy-team-preview [data-preview-pokemon="${mon}"]').click();true;`);await sleep(130);}
   assert(!(await run('window.__testSent')).some(a=>a.some(v=>String(v).includes('/team '))));
-  await shot('doubles-preview-selected');assert.equal(await run("getComputedStyle(document.querySelector('[data-choice-action=confirm]')).backgroundColor"),'rgb(213, 92, 117)');
+  await until("getComputedStyle(document.querySelector('[data-choice-action=confirm]')).backgroundColor==='rgb(213, 92, 117)'");await shot('doubles-preview-selected');
   await run(`document.querySelector('[data-order-slot="2"]').click();document.querySelector('[data-choice-action=clear]').click();true;`);assert(await run("document.querySelector('[data-choice-action=confirm]').disabled"));
   await run(`document.querySelector('.dfy-team-preview [data-preview-pokemon="4"]').click();document.querySelector('[data-choice-action=confirm]').click();true;`);await sleep(200);
   const sent=await run('window.__testSent');assert(sent.some(args=>args.some(v=>String(v).includes('/team 125436'))),JSON.stringify(sent));checks.push('own-only preview; arbitrary position buttons, undo and explicit confirmation; opponent stays in sidebar');
