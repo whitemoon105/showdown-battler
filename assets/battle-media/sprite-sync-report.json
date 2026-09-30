@@ -1,0 +1,10 @@
+{
+  "at": "2026-09-30T11:09:05.811Z",
+  "counts": {
+    "wiki-animated": 976,
+    "wiki-static": 174,
+    "fallback-static": 2,
+    "fallback-animated": 107
+  },
+  "unresolved": []
+}

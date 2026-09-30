@@ -1,0 +1,4 @@
+'use strict';
+const {contextBridge,ipcRenderer}=require('electron');
+const allowed=new Set(['bootstrap','update-status','update-check','update-download','update-install','project-open','account-save','account-delete','account-default','account-login','account-logout','web-open','web-layout','display-mode','audio','settings','ladder','history','rule','web-room','history-update','history-replay','quick-random','account-register','registration-save','teams','team-editor-data','team-editor-refresh','team-editor-update','team-validate','team-save','team-delete','team-draft','team-import','team-export','web-team','client-log','export-logs']);
+contextBridge.exposeInMainWorld('play',{invoke:(method,payload={})=>{if(!allowed.has(method))throw Error('对战版不支持此操作');return ipcRenderer.invoke('play',method,payload).then(r=>{if(!r.ok)throw Error(r.error);return r.data;});},onEvent:fn=>ipcRenderer.on('play:event',(_,data)=>fn(data))});

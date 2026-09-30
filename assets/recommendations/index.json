@@ -1,0 +1,239 @@
+{
+  "month": "2026-08",
+  "results": [
+    {
+      "format": "gen9uu",
+      "source": "smogon",
+      "species": 354
+    },
+    {
+      "format": "gen9ru",
+      "source": "smogon",
+      "species": 313
+    },
+    {
+      "format": "gen9nu",
+      "source": "smogon",
+      "species": 285
+    },
+    {
+      "format": "gen9pu",
+      "source": "smogon",
+      "species": 272
+    },
+    {
+      "format": "gen9lc",
+      "source": "smogon",
+      "species": 221
+    },
+    {
+      "format": "gen9monotype",
+      "source": "smogon",
+      "species": 435
+    },
+    {
+      "format": "gen9cap",
+      "source": "smogon",
+      "species": 278
+    },
+    {
+      "format": "gen9doublesou",
+      "source": "smogon",
+      "species": 463
+    },
+    {
+      "format": "gen9doublesubers",
+      "source": "smogon",
+      "species": 483
+    },
+    {
+      "format": "gen9doublesuu",
+      "source": "smogon",
+      "species": 442
+    },
+    {
+      "format": "gen9championsou",
+      "source": "smogon",
+      "species": 294
+    },
+    {
+      "format": "gen9championsuu",
+      "source": "smogon",
+      "species": 237
+    },
+    {
+      "format": "gen91v1",
+      "source": "smogon",
+      "species": 418
+    },
+    {
+      "format": "gen92v2doubles",
+      "source": "smogon",
+      "species": 448
+    },
+    {
+      "format": "gen9anythinggoes",
+      "source": "smogon",
+      "species": 589
+    },
+    {
+      "format": "gen9zu",
+      "source": "smogon",
+      "species": 236
+    },
+    {
+      "format": "gen9almostanyability",
+      "source": "smogon",
+      "species": 382
+    },
+    {
+      "format": "gen9balancedhackmons",
+      "source": "smogon",
+      "species": 500
+    },
+    {
+      "format": "gen9godlygift",
+      "source": "smogon",
+      "species": 346
+    },
+    {
+      "format": "gen9mixandmega",
+      "source": "smogon",
+      "species": 484
+    },
+    {
+      "format": "gen9pokebilitiesaaa",
+      "source": "smogon",
+      "species": 348
+    },
+    {
+      "format": "gen9sharedpower",
+      "source": "smogon",
+      "species": 377
+    },
+    {
+      "format": "gen9stabmons",
+      "source": "smogon",
+      "species": 307
+    },
+    {
+      "format": "gen6purehackmons",
+      "source": "smogon",
+      "species": 359
+    },
+    {
+      "format": "gen9nationaldex",
+      "source": "smogon",
+      "species": 614
+    },
+    {
+      "format": "gen9ubers",
+      "source": "smogon",
+      "species": 582
+    },
+    {
+      "format": "gen9nationaldexubers",
+      "source": "smogon",
+      "species": 852
+    },
+    {
+      "format": "gen9nationaldexuu",
+      "source": "smogon",
+      "species": 529
+    },
+    {
+      "format": "gen9nationaldexmonotype",
+      "source": "smogon",
+      "species": 573
+    },
+    {
+      "format": "gen9nationaldexdoubles",
+      "source": "smogon",
+      "species": 698
+    },
+    {
+      "format": "gen9metronomebattle",
+      "source": "smogon",
+      "species": 361
+    },
+    {
+      "format": "gen8ou",
+      "source": "smogon",
+      "species": 423
+    },
+    {
+      "format": "gen7ou",
+      "source": "smogon",
+      "species": 494
+    },
+    {
+      "format": "gen9ou",
+      "source": "smogon",
+      "species": 452
+    },
+    {
+      "format": "gen5ou",
+      "source": "smogon",
+      "species": 266
+    },
+    {
+      "format": "gen4ou",
+      "source": "smogon",
+      "species": 187
+    },
+    {
+      "format": "gen3ou",
+      "source": "smogon",
+      "species": 171
+    },
+    {
+      "format": "gen2ou",
+      "source": "smogon",
+      "species": 146
+    },
+    {
+      "format": "gen1ou",
+      "source": "smogon",
+      "species": 86
+    },
+    {
+      "format": "gen8doublesou",
+      "source": "smogon",
+      "species": 324
+    },
+    {
+      "format": "gen7doublesou",
+      "source": "smogon",
+      "species": 422
+    },
+    {
+      "format": "gen6doublesou",
+      "source": "smogon",
+      "species": 337
+    },
+    {
+      "format": "gen6ou",
+      "source": "smogon",
+      "species": 415
+    },
+    {
+      "format": "gen8nationaldex",
+      "source": "showdown-sets",
+      "species": 0
+    }
+  ],
+  "unavailable": [
+    "gen9championsbssregmc",
+    "gen9championsvgc2026regmc",
+    "gen9championsvgc2026regmcbo3",
+    "gen9freeforall",
+    "gen9noholdsbarred",
+    "gen9fortemons",
+    "gen9tiershiftaaa",
+    "gen9nfe",
+    "gen9nationaldex35pokes",
+    "gen2uu",
+    "gen1nu",
+    "gen9vgc2024regg"
+  ]
+}

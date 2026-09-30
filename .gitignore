@@ -1,0 +1,18 @@
+# 保留理由：依赖通过锁文件安装，避免发布机器相关或第三方运行时副本。
+node_modules/
+# 保留理由：安装包通过 GitHub Releases 发布，构建目录不作为源代码提交。
+dist/
+release/
+.showdown-battler-stage
+# 保留理由：账号、凭据、日志、缓存和调试记录只留在本机。
+.env
+.env.*
+*.log
+*.jsonl
+*.dmp
+*.pem
+*.pfx
+*.key
+coverage/
+test-results/
+.DS_Store

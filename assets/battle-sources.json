@@ -1,0 +1,24 @@
+{
+  "source": "https://wiki.52poke.com/zh-hans/太晶化",
+  "tera": {
+    "stellar": "https://s1.52poke.com/wiki/a/a4/%E5%A4%AA%E6%99%B6_%E6%98%9F%E6%99%B6_icon.png",
+    "grass": "https://s1.52poke.com/wiki/9/92/%E5%A4%AA%E6%99%B6_%E8%8D%89_icon.png",
+    "water": "https://s1.52poke.com/wiki/b/be/%E5%A4%AA%E6%99%B6_%E6%B0%B4_icon.png",
+    "fire": "https://s1.52poke.com/wiki/e/e7/%E5%A4%AA%E6%99%B6_%E7%81%AB_icon.png",
+    "electric": "https://s1.52poke.com/wiki/f/fa/%E5%A4%AA%E6%99%B6_%E7%94%B5_icon.png",
+    "normal": "https://s1.52poke.com/wiki/4/45/%E5%A4%AA%E6%99%B6_%E4%B8%80%E8%88%AC_icon.png",
+    "flying": "https://s1.52poke.com/wiki/b/b2/%E5%A4%AA%E6%99%B6_%E9%A3%9E%E8%A1%8C_icon.png",
+    "bug": "https://s1.52poke.com/wiki/b/b9/%E5%A4%AA%E6%99%B6_%E8%99%AB_icon.png",
+    "fighting": "https://s1.52poke.com/wiki/4/41/%E5%A4%AA%E6%99%B6_%E6%A0%BC%E6%96%97_icon.png",
+    "psychic": "https://s1.52poke.com/wiki/3/3d/%E5%A4%AA%E6%99%B6_%E8%B6%85%E8%83%BD%E5%8A%9B_icon.png",
+    "ghost": "https://s1.52poke.com/wiki/7/73/%E5%A4%AA%E6%99%B6_%E5%B9%BD%E7%81%B5_icon.png",
+    "ground": "https://s1.52poke.com/wiki/1/1d/%E5%A4%AA%E6%99%B6_%E5%9C%B0%E9%9D%A2_icon.png",
+    "rock": "https://s1.52poke.com/wiki/f/f4/%E5%A4%AA%E6%99%B6_%E5%B2%A9%E7%9F%B3_icon.png",
+    "ice": "https://s1.52poke.com/wiki/6/6d/%E5%A4%AA%E6%99%B6_%E5%86%B0_icon.png",
+    "dark": "https://s1.52poke.com/wiki/6/6e/%E5%A4%AA%E6%99%B6_%E6%81%B6_icon.png",
+    "fairy": "https://s1.52poke.com/wiki/e/e2/%E5%A4%AA%E6%99%B6_%E5%A6%96%E7%B2%BE_icon.png",
+    "poison": "https://s1.52poke.com/wiki/6/6f/%E5%A4%AA%E6%99%B6_%E6%AF%92_icon.png",
+    "steel": "https://s1.52poke.com/wiki/2/24/%E5%A4%AA%E6%99%B6_%E9%92%A2_icon.png",
+    "dragon": "https://s1.52poke.com/wiki/7/78/%E5%A4%AA%E6%99%B6_%E9%BE%99_icon.png"
+  }
+}

@@ -1,0 +1,815 @@
+{
+  "at": "2026-09-30T12:07:58.541Z",
+  "results": [
+    {
+      "id": "meowscarada",
+      "name": "Meowscarada",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "floragato",
+      "name": "Floragato",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "sprigatito",
+      "name": "Sprigatito",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "crocalor",
+      "name": "Crocalor",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "fuecoco",
+      "name": "Fuecoco",
+      "status": "downloaded",
+      "frames": 73
+    },
+    {
+      "id": "quaxly",
+      "name": "Quaxly",
+      "status": "downloaded",
+      "frames": 36
+    },
+    {
+      "id": "quaxwell",
+      "name": "Quaxwell",
+      "status": "downloaded",
+      "frames": 33
+    },
+    {
+      "id": "quaquaval",
+      "name": "Quaquaval",
+      "status": "downloaded",
+      "frames": 30
+    },
+    {
+      "id": "skeledirge",
+      "name": "Skeledirge",
+      "status": "downloaded",
+      "frames": 86
+    },
+    {
+      "id": "lechonk",
+      "name": "Lechonk",
+      "status": "downloaded",
+      "frames": 35
+    },
+    {
+      "id": "oinkologne",
+      "name": "Oinkologne",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "tarountula",
+      "name": "Tarountula",
+      "status": "downloaded",
+      "frames": 54
+    },
+    {
+      "id": "spidops",
+      "name": "Spidops",
+      "status": "downloaded",
+      "frames": 42
+    },
+    {
+      "id": "nymble",
+      "name": "Nymble",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "lokix",
+      "name": "Lokix",
+      "status": "downloaded",
+      "frames": 30
+    },
+    {
+      "id": "pawmot",
+      "name": "Pawmot",
+      "status": "downloaded",
+      "frames": 36
+    },
+    {
+      "id": "pawmi",
+      "name": "Pawmi",
+      "status": "downloaded",
+      "frames": 37
+    },
+    {
+      "id": "pawmo",
+      "name": "Pawmo",
+      "status": "downloaded",
+      "frames": 36
+    },
+    {
+      "id": "tandemaus",
+      "name": "Tandemaus",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "fidough",
+      "name": "Fidough",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "dachsbun",
+      "name": "Dachsbun",
+      "status": "downloaded",
+      "frames": 40
+    },
+    {
+      "id": "smoliv",
+      "name": "Smoliv",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "dolliv",
+      "name": "Dolliv",
+      "status": "downloaded",
+      "frames": 35
+    },
+    {
+      "id": "arboliva",
+      "name": "Arboliva",
+      "status": "downloaded",
+      "frames": 55
+    },
+    {
+      "id": "nacli",
+      "name": "Nacli",
+      "status": "downloaded",
+      "frames": 45
+    },
+    {
+      "id": "naclstack",
+      "name": "Naclstack",
+      "status": "downloaded",
+      "frames": 65
+    },
+    {
+      "id": "garganacl",
+      "name": "Garganacl",
+      "status": "downloaded",
+      "frames": 85
+    },
+    {
+      "id": "charcadet",
+      "name": "Charcadet",
+      "status": "downloaded",
+      "frames": 130
+    },
+    {
+      "id": "tadbulb",
+      "name": "Tadbulb",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "armarouge",
+      "name": "Armarouge",
+      "status": "downloaded",
+      "frames": 129
+    },
+    {
+      "id": "ceruledge",
+      "name": "Ceruledge",
+      "status": "downloaded",
+      "frames": 130
+    },
+    {
+      "id": "wattrel",
+      "name": "Wattrel",
+      "status": "downloaded",
+      "frames": 29
+    },
+    {
+      "id": "kilowattrel",
+      "name": "Kilowattrel",
+      "status": "downloaded",
+      "frames": 25
+    },
+    {
+      "id": "bellibolt",
+      "name": "Bellibolt",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "maschiff",
+      "name": "Maschiff",
+      "status": "downloaded",
+      "frames": 30
+    },
+    {
+      "id": "mabosstiff",
+      "name": "Mabosstiff",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "grafaiai",
+      "name": "Grafaiai",
+      "status": "downloaded",
+      "frames": 29
+    },
+    {
+      "id": "shroodle",
+      "name": "Shroodle",
+      "status": "downloaded",
+      "frames": 29
+    },
+    {
+      "id": "toedscool",
+      "name": "Toedscool",
+      "status": "downloaded",
+      "frames": 51
+    },
+    {
+      "id": "bramblin",
+      "name": "Bramblin",
+      "status": "downloaded",
+      "frames": 86
+    },
+    {
+      "id": "toedscruel",
+      "name": "Toedscruel",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "brambleghast",
+      "name": "Brambleghast",
+      "status": "downloaded",
+      "frames": 89
+    },
+    {
+      "id": "klawf",
+      "name": "Klawf",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "capsakid",
+      "name": "Capsakid",
+      "status": "downloaded",
+      "frames": 25
+    },
+    {
+      "id": "scovillain",
+      "name": "Scovillain",
+      "status": "downloaded",
+      "frames": 36
+    },
+    {
+      "id": "rellor",
+      "name": "Rellor",
+      "status": "downloaded",
+      "frames": 24
+    },
+    {
+      "id": "flittle",
+      "name": "Flittle",
+      "status": "downloaded",
+      "frames": 59
+    },
+    {
+      "id": "espathra",
+      "name": "Espathra",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "tinkatink",
+      "name": "Tinkatink",
+      "status": "downloaded",
+      "frames": 32
+    },
+    {
+      "id": "tinkatuff",
+      "name": "Tinkatuff",
+      "status": "downloaded",
+      "frames": 32
+    },
+    {
+      "id": "wiglett",
+      "name": "Wiglett",
+      "status": "downloaded",
+      "frames": 36
+    },
+    {
+      "id": "tinkaton",
+      "name": "Tinkaton",
+      "status": "downloaded",
+      "frames": 35
+    },
+    {
+      "id": "bombirdier",
+      "name": "Bombirdier",
+      "status": "downloaded",
+      "frames": 22
+    },
+    {
+      "id": "rabsca",
+      "name": "Rabsca",
+      "status": "downloaded",
+      "frames": 173
+    },
+    {
+      "id": "wugtrio",
+      "name": "Wugtrio",
+      "status": "downloaded",
+      "frames": 32
+    },
+    {
+      "id": "palafin",
+      "name": "Palafin",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "finizen",
+      "name": "Finizen",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "varoom",
+      "name": "Varoom",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "cyclizar",
+      "name": "Cyclizar",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "revavroom",
+      "name": "Revavroom",
+      "status": "downloaded",
+      "frames": 65
+    },
+    {
+      "id": "orthworm",
+      "name": "Orthworm",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "glimmet",
+      "name": "Glimmet",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "greavard",
+      "name": "Greavard",
+      "status": "downloaded",
+      "frames": 22
+    },
+    {
+      "id": "flamigo",
+      "name": "Flamigo",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "houndstone",
+      "name": "Houndstone",
+      "status": "downloaded",
+      "frames": 32
+    },
+    {
+      "id": "glimmora",
+      "name": "Glimmora",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "cetoddle",
+      "name": "Cetoddle",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "cetitan",
+      "name": "Cetitan",
+      "status": "downloaded",
+      "frames": 65
+    },
+    {
+      "id": "veluza",
+      "name": "Veluza",
+      "status": "downloaded",
+      "frames": 54
+    },
+    {
+      "id": "annihilape",
+      "name": "Annihilape",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "dondozo",
+      "name": "Dondozo",
+      "status": "downloaded",
+      "frames": 90
+    },
+    {
+      "id": "clodsire",
+      "name": "Clodsire",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "farigiraf",
+      "name": "Farigiraf",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "kingambit",
+      "name": "Kingambit",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "greattusk",
+      "name": "Colmilargo",
+      "status": "downloaded",
+      "frames": 54
+    },
+    {
+      "id": "screamtail",
+      "name": "Colagrito",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "brutebonnet",
+      "name": "Furioseta",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "fluttermane",
+      "name": "Melenaleteo",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "slitherwing",
+      "name": "Reptalada",
+      "status": "downloaded",
+      "frames": 44
+    },
+    {
+      "id": "sandyshocks",
+      "name": "Pelarena",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "irontreads",
+      "name": "Ferrodada",
+      "status": "downloaded",
+      "frames": 51
+    },
+    {
+      "id": "ironbundle",
+      "name": "Ferrosaco",
+      "status": "downloaded",
+      "frames": 66
+    },
+    {
+      "id": "ironhands",
+      "name": "Ferropalmas",
+      "status": "downloaded",
+      "frames": 71
+    },
+    {
+      "id": "ironjugulis",
+      "name": "Ferrocuello",
+      "status": "downloaded",
+      "frames": 65
+    },
+    {
+      "id": "ironthorns",
+      "name": "Ferropúas",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "frigibax",
+      "name": "Frigibax",
+      "status": "downloaded",
+      "frames": 41
+    },
+    {
+      "id": "ironmoth",
+      "name": "Ferropolilla",
+      "status": "downloaded",
+      "frames": 86
+    },
+    {
+      "id": "gimmighoul",
+      "name": "Gimmighoul",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "arctibax",
+      "name": "Arctibax",
+      "status": "downloaded",
+      "frames": 58
+    },
+    {
+      "id": "baxcalibur",
+      "name": "Baxcalibur",
+      "status": "downloaded",
+      "frames": 79
+    },
+    {
+      "id": "gholdengo",
+      "name": "Gholdengo",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "wochien",
+      "name": "Wo-Chien",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "chienpao",
+      "name": "Chien-Pao",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "tinglu",
+      "name": "Ting-Lu",
+      "status": "downloaded",
+      "frames": 50
+    },
+    {
+      "id": "roaringmoon",
+      "name": "Bramaluna",
+      "status": "downloaded",
+      "frames": 54
+    },
+    {
+      "id": "chiyu",
+      "name": "Chi-Yu",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "ironvaliant",
+      "name": "Ferropaladín",
+      "status": "downloaded",
+      "frames": 72
+    },
+    {
+      "id": "miraidon",
+      "name": "Miraidon",
+      "status": "downloaded",
+      "frames": 65
+    },
+    {
+      "id": "koraidon",
+      "name": "Koraidon",
+      "status": "downloaded",
+      "frames": 79
+    },
+    {
+      "id": "walkingwake",
+      "name": "Ondulagua",
+      "status": "downloaded",
+      "frames": 43
+    },
+    {
+      "id": "ironleaves",
+      "name": "Ferroverdor",
+      "status": "downloaded",
+      "frames": 82
+    },
+    {
+      "id": "dipplin",
+      "name": "Dipplin",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "poltchageist",
+      "name": "Poltchageist",
+      "status": "downloaded",
+      "frames": 176
+    },
+    {
+      "id": "sinistcha",
+      "name": "Sinistcha",
+      "status": "downloaded",
+      "frames": 176
+    },
+    {
+      "id": "okidogi",
+      "name": "Okidogi",
+      "status": "downloaded",
+      "frames": 80
+    },
+    {
+      "id": "munkidori",
+      "name": "Munkidori",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "hydrapple",
+      "name": "Hydrapple",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "fezandipiti",
+      "name": "Fezandipiti",
+      "status": "downloaded",
+      "frames": 88
+    },
+    {
+      "id": "archaludon",
+      "name": "Archaludon",
+      "status": "downloaded",
+      "frames": 112
+    },
+    {
+      "id": "ragingbolt",
+      "name": "Electrofuria",
+      "status": "downloaded",
+      "frames": 200
+    },
+    {
+      "id": "gougingfire",
+      "name": "Flamariete",
+      "status": "downloaded",
+      "frames": 128
+    },
+    {
+      "id": "pecharunt",
+      "name": "Pecharunt",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "ironboulder",
+      "name": "Ferromole",
+      "status": "downloaded",
+      "frames": 176
+    },
+    {
+      "id": "ironcrown",
+      "name": "Ferrotesta",
+      "status": "downloaded",
+      "frames": 160
+    },
+    {
+      "id": "ogerpon",
+      "name": "Ogerpon máscara turquesa",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "ogerponhearthflame",
+      "name": "Ogerpon máscara horno",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "ogerponwellspring",
+      "name": "Ogerpon máscara fuente",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "ogerponcornerstone",
+      "name": "Ogerpon máscara cimiento",
+      "status": "downloaded",
+      "frames": 96
+    },
+    {
+      "id": "palafinhero",
+      "name": "Palafin forma heroica",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "tatsugiridroopy",
+      "name": "Tatsugiri forma lánguida",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "tatsugiri",
+      "name": "Tatsugiri forma curvada",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "tatsugiristretchy",
+      "name": "Tatsugiri forma recta",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "maushold",
+      "name": "Maushold familia de cuatro",
+      "status": "downloaded",
+      "frames": 22
+    },
+    {
+      "id": "mausholdfour",
+      "name": "Maushold familia de cuatro",
+      "status": "downloaded",
+      "frames": 22
+    },
+    {
+      "id": "dudunsparce",
+      "name": "Dudunsparce forma binodular",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "ursalunabloodmoon",
+      "name": "Ursaluna luna carmesí",
+      "status": "downloaded",
+      "frames": 134
+    },
+    {
+      "id": "dudunsparcethreesegment",
+      "name": "Dudunsparce forma trinodular",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "mausholdthree",
+      "name": "Maushold familia de tres",
+      "status": "downloaded",
+      "frames": 48
+    },
+    {
+      "id": "squawkabilly",
+      "name": "Squawkabilly plumaje verde",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "squawkabillyblue",
+      "name": "Squawkabilly plumaje azul",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "squawkabillyyellow",
+      "name": "Squawkabilly plumaje amarillo",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "squawkabillywhite",
+      "name": "Squawkabilly plumaje blanco",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "terapagos",
+      "name": "Terapagos forma normal",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "terapagosterastal",
+      "name": "Terapagos forma teracristal",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    },
+    {
+      "id": "terapagosstellar",
+      "name": "Terapagos forma astral",
+      "status": "unavailable",
+      "reason": "HTTP 404"
+    }
+  ]
+}

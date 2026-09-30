@@ -1,0 +1,11 @@
+{
+  "name": "Showdown对战器",
+  "short_name": "Showdown对战器",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f1f3f8",
+  "theme_color": "#d45568",
+  "icons": [{"src":"/icon.png","sizes":"192x192","type":"image/png"},{"src":"/icon.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+}

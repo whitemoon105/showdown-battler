@@ -1,0 +1,16 @@
+# 保留理由：统一源文件换行，避免跨平台检出产生无意义的整文件差异。
+* text=auto
+*.cjs text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+# 保留理由：多媒体和离线引擎归档必须逐字节保留，否则哈希校验会失败。
+*.webp binary
+*.gif binary
+*.png binary
+*.ico binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.tgz binary
