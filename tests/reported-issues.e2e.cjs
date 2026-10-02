@@ -7,6 +7,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  const env={...process.env,DFY_PLAY_HOME:out+'/issues-data',DFY_PLAY_CACHE:out+'/issues-cache'};delete env.ELECTRON_RUN_AS_NODE;
  const app=await _electron.launch({executablePath:process.env.SHOWDOWN_TEST_EXE||path.resolve('node_modules/electron/dist/electron.exe'),args:process.env.SHOWDOWN_TEST_EXE?[]:[path.resolve('.')],env});
  const page=await app.firstWindow();page.setDefaultTimeout(20000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const foreground=()=>app.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];w.restore();w.show();w.focus();});await foreground();
  const run=code=>app.evaluate(async({webContents},code)=>{const w=webContents.getAllWebContents().find(w=>w.getURL().startsWith('https://play.pokemonshowdown.com'));return w?.executeJavaScript(code);},code);
  const until=async code=>{for(let i=0;i<100;i++){if(await run(code))return;await sleep(300);}throw Error('Timed out: '+code);};
  try{
@@ -35,7 +36,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const sprites=await run(`(async()=>{const nodes=[...document.querySelectorAll('#room-teambuilder .setchart')].slice(0,2);return Promise.all(nodes.map(async n=>{const url=getComputedStyle(n).backgroundImage.slice(5,-2);const img=new Image();img.src=url;await img.decode();return{url,width:img.naturalWidth,height:img.naturalHeight,backgroundSize:getComputedStyle(n).backgroundSize};}));})()`);
   assert.equal(sprites.length,2);assert.match(sprites[0].url,/dfy-asset:\/\/battle\/sprite\/calyrexshadow\//);assert.match(sprites[1].url,/\/slowkinggalar\//);assert(sprites.every(s=>s.width>0&&s.height>0));
   const icons=await run(`(async()=>{const item=document.querySelector('#room-teambuilder .itemicon'),type=document.querySelector('#room-teambuilder .dfy-native-type i');return Promise.all([item,type].map(async n=>{const url=getComputedStyle(n).backgroundImage.slice(5,-2),img=new Image();img.src=url;await img.decode();return{url,width:img.naturalWidth};}));})()`);assert(icons.every(i=>i.url.startsWith('dfy-asset:')&&i.width>0));
-  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].showInactive());await sleep(250);
+  await foreground();await sleep(250);
   const capture=await app.evaluate(async({webContents})=>(await webContents.getAllWebContents().find(w=>w.getURL().startsWith('https://play.pokemonshowdown.com')).capturePage()).toPNG().toString('base64'));fs.writeFileSync(out+'/native-teambuilder-offline.png',Buffer.from(capture,'base64'));
   assert.deepEqual(errors,[]);const report={checks:['modal validation error readable and retry preserves inputs','statistics finish with cached fallback and retry enabled','refresh survives navigation and ignores old-format results','native teambuilder exact-form portraits, item and type icons decode offline'],sprites,icons,errors};fs.writeFileSync(out+'/reported-issues.json',JSON.stringify(report,null,2));console.log(report);
  }finally{await app.close();}
