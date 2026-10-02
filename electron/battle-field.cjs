@@ -22,7 +22,7 @@ function install() {
   arena.prepend(ground);arena.append(air,status);
   const inspector=window.__dfyBattleInspector({arena,battle,globalIcons:status,privateData,zh});
   const g=ground.getContext('2d'),a=air.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let state=readState(battle),key='',frame=0,disposed=false,running=false,last=0,clock=0,width=1,height=1,scale=1,dx=0,dy=0,dpr=1,draws=0;
+  let state=readState(battle),key='',frame=0,disposed=false,running=false,last=0,clock=0,width=1,height=1,scale=1,dx=0,dy=0,dpr=1,draws=0,camera=null;
   const mod=(n,m)=>((n%m)+m)%m,rand=i=>mod(Math.sin(i*127.1+311.7)*43758.5453,1),has=id=>state.rooms.some(p=>p.id===id);
   const terrainColors={electricterrain:'#e6b649',grassyterrain:'#62b99d',mistyterrain:'#dfa1c6',psychicterrain:'#b795da'};
   function path(c,points,color,lineWidth=1,close=false){c.beginPath();c.moveTo(...points[0]);for(const p of points.slice(1))c.lineTo(...p);if(close)c.closePath();c.strokeStyle=color;c.lineWidth=lineWidth;c.stroke();}
@@ -106,7 +106,7 @@ function install() {
   }
   function draw(t,full=false){if(disposed)return;prepare(a,air);if(full||!draws)floor(t);if(state.terrain)terrain(t,state.terrain.id);atmosphere(t);draws++;}
   function tick(now){frame=0;if(!running||disposed)return;if(now-last>=41){clock+=Math.min(80,now-last);last=now;draw(clock);}frame=requestAnimationFrame(tick);}
-  function resize(){width=arena.clientWidth||1;height=arena.clientHeight||1;scale=Math.min(width/640,height/360);dx=(width-640*scale)/2;dy=(height-360*scale)/2;dpr=Math.min(devicePixelRatio||1,1.25);for(const c of [ground,air]){c.width=Math.round(width*dpr);c.height=Math.round(height*dpr);}draw(clock,true);}
+  function resize(){width=arena.clientWidth||1;height=arena.clientHeight||1;scale=camera?.scale||Math.min(width/640,height/360);dx=camera?.left??(width-640*scale)/2;dy=camera?.top??(height-360*scale)/2;dpr=Math.min(devicePixelRatio||1,1.25);for(const c of [ground,air]){c.width=Math.round(width*dpr);c.height=Math.round(height*dpr);}draw(clock,true);}
   function sync(){
    if(disposed)return;state=readState(battle);const next=JSON.stringify([state,battle.nearSide?.active.length]);
    if(next!==key){key=next;arena.dataset.weather=state.weather?.suppressed?'':state.weather?.id||'';arena.dataset.terrain=state.terrain?.id||'';arena.dataset.rooms=state.rooms.map(p=>p.id).join(' ');mark?.('field-state',next);draw(clock,true);}
@@ -120,7 +120,7 @@ function install() {
   }
   document.addEventListener('visibilitychange',sync);reduced.addEventListener('change',sync);
   const observer=new ResizeObserver(resize);observer.observe(arena);resize();sync();
-  return{sync,info:()=>({state,running,draws,canvases:2}),dispose(){disposed=true;cancelAnimationFrame(frame);observer.disconnect();document.removeEventListener('visibilitychange',sync);reduced.removeEventListener('change',sync);ground.remove();air.remove();status.remove();inspector.dispose();}};
+  return{sync,setCamera(value){if(camera&&camera.scale===value.scale&&camera.left===value.left&&camera.top===value.top)return;camera=value;resize();},info:()=>({state,running,draws,canvases:2,camera}),dispose(){disposed=true;cancelAnimationFrame(frame);observer.disconnect();document.removeEventListener('visibilitychange',sync);reduced.removeEventListener('change',sync);ground.remove();air.remove();status.remove();inspector.dispose();}};
  };
 }
 module.exports={readFieldState,install};

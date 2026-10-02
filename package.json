@@ -1,6 +1,6 @@
 {
   "name": "showdown-battler",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "Showdown对战器 · 账号、战绩与随机对战",
   "main": "electron/play-main.cjs",
   "author": "白月遥",
@@ -10,7 +10,8 @@
     "test": "node --test tests/*.test.cjs",
     "test:ui": "node tests/team-editor.e2e.cjs",
     "test:battle": "node tests/battle-presentation.e2e.cjs",
-    "test:doubles": "node tests/doubles.e2e.cjs"
+    "test:doubles": "node tests/doubles.e2e.cjs",
+    "test:layout": "node tests/battle-layout.e2e.cjs"
   },
   "dependencies": {
     "cheerio": "^1.1.2",

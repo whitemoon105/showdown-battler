@@ -7,6 +7,8 @@ class ShowdownViews {
     ipcMain.handle('dfy:showdown-bootstrap',event=>{if(!entry(event))throw Error('未知对战页面');return this.presentation?.()||'';});
     this.readyListener=(event,error)=>{const row=entry(event);if(!row)return;const [server,view]=row;if(error){this.log?.('showdown.bootstrap-failed',{server,error});this.send({type:'web-status',server,error:'对战界面加载失败：'+error});return;}view.presentationReady=true;this.layout({visible:this.visible});Promise.resolve(this.translate(view)).catch(e=>{this.log?.('showdown.translate-failed',{server,error:e.message});this.send({type:'web-status',server,error:e.message});});};
     ipcMain.on('dfy:showdown-ready',this.readyListener);
+    this.navigateListener=(event,page)=>{if(entry(event)&&['accounts','teams'].includes(page))this.send({type:'navigate',page});};
+    ipcMain.on('dfy:showdown-navigate',this.navigateListener);
   }
   checkIpLock(server,url){
     if(this.lockNotified.has(server))return;
@@ -55,6 +57,6 @@ class ShowdownViews {
     let view=this.views.get('reference');if(!view){const partition='persist:reference',s=session.fromPartition(partition);await s.setProxy({mode:'direct'});s.setPermissionRequestHandler((_,__,done)=>done(false));view=new WebContentsView({webPreferences:{partition,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true}});this.views.set('reference',view);this.main.contentView.addChildView(view);view.webContents.on('dom-ready',()=>this.translate(view));view.webContents.setWindowOpenHandler(({url})=>{try{const next=new URL(url);if(['www.smogon.com','smogon.com','wiki.52poke.com'].includes(next.hostname))this.openResource(url);else if(next.protocol==='https:')shell.openExternal(url);}catch{}return{action:'deny'};});view.webContents.on('will-navigate',(e,href)=>{if(!this.approved(href))e.preventDefault();});}
     this.active='reference';this.layout({visible:true,bounds:this.bounds});await view.webContents.loadURL(u.href);return{opened:true,url:u.href};
   }
-  close(){ipcMain.removeHandler('dfy:showdown-bootstrap');ipcMain.removeListener('dfy:showdown-ready',this.readyListener);for(const view of this.views.values())if(!view.webContents.isDestroyed())view.webContents.close();this.views.clear();}
+  close(){ipcMain.removeHandler('dfy:showdown-bootstrap');ipcMain.removeListener('dfy:showdown-ready',this.readyListener);ipcMain.removeListener('dfy:showdown-navigate',this.navigateListener);for(const view of this.views.values())if(!view.webContents.isDestroyed())view.webContents.close();this.views.clear();}
 }
 module.exports={ShowdownViews};

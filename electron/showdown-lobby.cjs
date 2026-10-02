@@ -1,7 +1,7 @@
 'use strict';
 // Runs inside the existing Showdown client. The native client retains ownership
 // of search, PM, challenge, team validation, and popup selection handlers.
-function install({css='',dictionary={}}={}) {
+function install({css='',dictionary={},playEdition=false}={}) {
  if(window.__dfyLobby){window.__dfyLobby.refresh();return;}
  const style=document.createElement('style');style.id='dfy-lobby-theme';style.textContent=css;document.head.append(style);
  const make=(tag,cls,text)=>{const node=document.createElement(tag);node.className=cls;if(text)node.textContent=text;return node;};
@@ -104,8 +104,9 @@ function install({css='',dictionary={}}={}) {
  observer.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['data-dfy-display','style','hidden','disabled']});
  document.addEventListener('click',e=>{if(game()&&e.target.closest('[data-native-action=format],[data-native-action=finduser]'))lastFocus=e.target.closest('button');},true);
  document.addEventListener('keydown',e=>{if(game()&&e.key==='Escape'&&document.querySelector('.dfy-popup')){e.preventDefault();e.stopImmediatePropagation();closePopup();}},true);
+ const onNavigation=e=>{if(!playEdition||!game()||!e.target.closest('.ps-popup [name=teambuilder]'))return;e.preventDefault();e.stopImmediatePropagation();closePopup();window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:'teams'}));};document.addEventListener('click',onNavigation,true);
  const timer=setInterval(()=>{if(game()&&queueState)refresh();},1000);
- window.__dfyLobby={refresh,chooseTeam,destroy(){observer.disconnect();clearInterval(timer);style.remove();delete window.__dfyLobby;}};
+ window.__dfyLobby={refresh,chooseTeam,destroy(){document.removeEventListener('click',onNavigation,true);observer.disconnect();clearInterval(timer);style.remove();delete window.__dfyLobby;}};
  refresh();
 }
 module.exports={install};

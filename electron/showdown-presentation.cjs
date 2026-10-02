@@ -5,8 +5,8 @@ const assetMeta=Object.fromEntries(Object.entries(require('../assets/battle-medi
 const dictionary=require('../assets/zh-dictionary.json');
 function script({mode='game',playEdition=false}={}){
  const battle={css:fs.readFileSync(path.join(__dirname,'../assets/battle-ui.css'),'utf8'),dictionary,assetMeta};
- const lobby={css:fs.readFileSync(path.join(__dirname,'../assets/lobby-ui.css'),'utf8'),dictionary};
+ const lobby={playEdition,css:fs.readFileSync(path.join(__dirname,'../assets/lobby-ui.css'),'utf8'),dictionary};
  const field=require('./battle-field.cjs');
- return 'window.__dfySpriteDimensions='+require('../core/battle-scale.cjs').spriteDimensions.toString()+';('+require('./battle-choice.cjs').install.toString()+')();('+require('./battle-inspector.cjs').install.toString()+')();window.__dfyReadFieldState='+field.readFieldState.toString()+';('+field.install.toString()+')();('+require('./play-battle.cjs').install.toString()+')('+JSON.stringify(battle)+');('+require('./showdown-game.cjs').mount.toString()+')('+JSON.stringify({mode,dictionary,dual:true,playEdition})+');('+require('./showdown-lobby.cjs').install.toString()+')('+JSON.stringify(lobby)+');document.head.append(document.getElementById("dfy-dual-theme"));';
+ return 'window.__dfyBattleCamera='+require('../core/battle-scale.cjs').battleCamera.toString()+';window.__dfySpriteDimensions='+require('../core/battle-scale.cjs').spriteDimensions.toString()+';('+require('./battle-choice.cjs').install.toString()+')();('+require('./battle-inspector.cjs').install.toString()+')();window.__dfyReadFieldState='+field.readFieldState.toString()+';('+field.install.toString()+')();('+require('./play-battle.cjs').install.toString()+')('+JSON.stringify(battle)+');('+require('./showdown-game.cjs').mount.toString()+')('+JSON.stringify({mode,dictionary,dual:true,playEdition})+');('+require('./showdown-lobby.cjs').install.toString()+')('+JSON.stringify(lobby)+');document.head.append(document.getElementById("dfy-dual-theme"));';
 }
 module.exports={script};

@@ -96,7 +96,7 @@ function mount(options={}){
     button.append(element('small','',team?.name||'选择一支出战队伍'));
     if(team){const row=element('span','dfy-team-miniatures');for(const p of Storage.unpackTeam(team.team)||[]){const img=element('img','');img.src='dfy-asset://battle/sprite/'+Dex.species.get(p.species).id+'/front/normal/M';img.alt=zh(p.species);img.title=zh(p.species);row.append(img);}button.append(row);}
    }
-   button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!native.isConnected||native.disabled)return;if(action==='team'&&window.__dfyLobby){window.__dfyLobby.chooseTeam(native,button);}else native.click();queue();});
+   button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!native.isConnected||native.disabled)return;if(playEdition&&mode==='game'&&((action==='joinRoom'&&native.value==='teambuilder')||action==='login')){window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:action==='login'?'accounts':'teams'}));return;}if(action==='team'&&window.__dfyLobby){window.__dfyLobby.chooseTeam(native,button);}else native.click();queue();});
    target.append(button);
   }
  }
@@ -111,8 +111,8 @@ function mount(options={}){
   const header=document.querySelector('.header');if(header){
    if(!nav?.isConnected){nav=element('nav','dfy-game-navigation');header.append(nav);}
    const tabs=[...document.querySelectorAll('.tabbar a')].filter(a=>a.textContent.trim()&&!a.classList.contains('closebutton')&&a.getAttribute('href')?.startsWith('/'));
-   const key=tabs.map(a=>a.getAttribute('href')+'|'+a.textContent+'|'+a.className).join(';')+'|'+(app.user?.get('name')||'');
-   if(nav.dataset.key!==key){nav.dataset.key=key;nav.replaceChildren();for(const a of tabs){const href=a.getAttribute('href'),button=element('button','',({'/':'大厅','/teambuilder':'队伍','/ladder':'排行'})[href]||(href.startsWith('/battle-')?'对战':zh(a.textContent.replace(/×/g,'').trim())));button.setAttribute('aria-current',String(a.classList.contains('cur')||a.parentElement?.classList.contains('cur')));button.onclick=e=>{e.stopPropagation();a.click();};nav.append(button);}const login=document.querySelector('.userbar button[name=login],.userbar button[name=rename],.userbar button[name=changeName]');if(login){const b=element('button','',app.user?.get('named')?app.user.get('name'):'登录');b.onclick=e=>{e.stopPropagation();login.click();};nav.append(b);}}
+   const key=tabs.map(a=>a.getAttribute('href')+'|'+a.textContent+'|'+a.className).join(';')+'|'+(app.user?.get('name')||'')+'|'+!!app.user?.get('named')+'|'+!!document.querySelector('.userbar button[name=login],.userbar button[name=rename],.userbar button[name=changeName]');
+   if(nav.dataset.key!==key){nav.dataset.key=key;nav.replaceChildren();for(const a of tabs){const href=a.getAttribute('href'),button=element('button','',({'/':'大厅','/teambuilder':'队伍','/ladder':'排行'})[href]||(href.startsWith('/battle-')?'对战':zh(a.textContent.replace(/×/g,'').trim())));button.setAttribute('aria-current',String(a.classList.contains('cur')||a.parentElement?.classList.contains('cur')));button.onclick=e=>{e.stopPropagation();if(playEdition&&href==='/teambuilder')window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:'teams'}));else a.click();};nav.append(button);}const login=document.querySelector('.userbar button[name=login],.userbar button[name=rename],.userbar button[name=changeName]');if(login){const b=element('button','',app.user?.get('named')?app.user.get('name'):'登录');b.dataset.shellPage='accounts';b.onclick=e=>{e.stopPropagation();if(playEdition)window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:'accounts'}));else login.click();};nav.append(b);}}
   }
   const builder=window.app?.rooms?.teambuilder,host=builder?.el;if(host&&!playEdition){
    if(!teamRoom||teamRoom.host!==host||!teamRoom.view.isConnected){const view=element('section','dfy-game-hub');host.append(view);teamRoom={host,view};}

@@ -5,8 +5,18 @@ function spriteDimensions({width,height,heightm=1.5,front=true,gen=9,doubles=fal
  const stature=Math.max(.72,Math.min(1.85,Math.sqrt((heightm||1.5)/1.6)*shape));
  const perspective=near?(gen===5?2:1.5):1;
  const depth=doubles?(near?(slot===0?.91:1):(slot===1?.94:1)):1;
- const size=depth*(near?(doubles?136:150):(doubles?88:100))*stature*(dynamax?1.6:1),fit=size/Math.max(w,h)/perspective;
+ const base=(near?(doubles?174:186):(doubles?120:136))*stature;
+ const size=depth*Math.min(base,doubles?(near?245:225):(near?290:252))*(dynamax?1.6:1),fit=size/Math.max(w,h)/perspective;
  const renderedHeight=Math.round(h*fit),ground=near?326:224,center=near?245:135;
  return{w:Math.max(1,Math.round(w*fit)),h:Math.max(1,renderedHeight),y:(ground-center)/perspective-renderedHeight/2};
 }
-module.exports={spriteDimensions};
+// The whole scene shares one transform, including platforms and weather. Fit the
+// stable silhouettes between the HUD columns; attacks never drive the camera.
+function battleCamera({width,height,bounds=[],leftInset=0,rightInset=0,doubles=false}){
+ const valid=bounds.filter(b=>Number.isFinite(b.x+b.y+b.w+b.h)&&b.w>0&&b.h>0);
+ const x1=Math.min(doubles?90:140,...valid.map(b=>b.x))-18,x2=Math.max(doubles?590:540,...valid.map(b=>b.x+b.w))+18;
+ const y1=Math.min(125,...valid.map(b=>b.y))-28,y2=Math.max(360,...valid.map(b=>b.y+b.h))+8;
+ const area=Math.max(180,width-leftInset-rightInset),scale=Math.max(.1,Math.min(area/(x2-x1),Math.max(80,height-20)/(y2-y1),2.1));
+ return {scale,left:leftInset+area/2-(x1+x2)*scale/2,top:height-10-y2*scale};
+}
+module.exports={spriteDimensions,battleCamera};

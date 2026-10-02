@@ -22,6 +22,7 @@ const handlers={
  ...require('./play-teams.cjs').handlers({store,logger,parent:()=>main,openView,contents:()=>web.views.get(web.active).webContents,server:()=>settings().server}),
  'account-save':p=>{accounts.save({...p,role:'player'});return accounts.list();},'account-delete':p=>accounts.remove(p.id),'account-default':p=>accounts.setDefault(p.id),
  'account-register':p=>require('./play-registration.cjs').register({parent:main,store,input:p}),
+ 'registration-cancel':()=>require('./play-registration.cjs').cancel(),
  'registration-save':p=>{const value=require('./play-registration.cjs').take(p.token);accounts.save({...value,role:'player',isDefault:!accounts.list().some(a=>a.server===value.server)});return accounts.list();},
  'account-login':async p=>{const c=accounts.credentials(p.id);await openView(c.server);return require('./player-login.cjs').login(web.views.get(c.server).webContents,c);},
  'account-logout':async()=>{const wc=web.views.get(web.active)?.webContents;if(wc)await wc.executeJavaScript('(()=>{if(Object.values(app.rooms).some(r=>r.request?.side&&!r.battle?.ended))throw Error("请先结束当前对局");app.user.logout();})()');return{};},
