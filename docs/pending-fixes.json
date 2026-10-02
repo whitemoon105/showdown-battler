@@ -1,0 +1,48 @@
+{
+  "savedAt": "2026-10-02",
+  "status": "用户要求先保存并暂停修复；本轮已完成初步定位，尚未修改功能代码。",
+  "baselineCommit": "572c4528400d0f46872eab9b8d58913c2314830c",
+  "deliveryPreference": {
+    "instruction": "后续完成修复并验证后同步 Git；用户此前明确不再打包。",
+    "保留理由": "保留用户最近确认的交付范围，避免恢复任务时自行打包或安装。"
+  },
+  "tasks": [
+    {
+      "title": "组队规则约束应覆盖道具、招式、形态、太晶及队伍组合",
+      "userExamples": ["宝冠军限定可用道具及招式，并禁止重复携带同一道具", "OU 中厄诡椪的面具和太晶属性限制"],
+      "confirmed": [
+        "core/team-editor.cjs 的 update 只检查候选名称、单项招式可学习性、基础特性及数值，没有执行完整配装与队伍组合校验。",
+        "已复现：gen9ou 下 Ogerpon-Wellspring 可以通过 editor.update 设置 Leftovers、Fire 太晶及 Ivy Cudgel。",
+        "同一文本交给 core/dex.cjs 的 validate 后，Showdown TeamValidator 正确返回缺 Wellspring Mask、太晶必须 Water 等错误。",
+        "electron/play-teams.cjs 的 team-save 和 web-team 已有完整 validateTeam 门禁，不能误称所有保存/出战路径完全没有校验。",
+        "道具候选已调用当前规则的 checkItem，但没有结合选中形态的 requiredItems 或队友所持道具；太晶候选使用全局 cat.types。",
+        "gen9championsvgc2026regmc 使用 champions mod，规则表包含 itemclause，valueRules.get('itemclause') 为 1。",
+        "read 的 legality 目前主要是 speciesStatus，不能说明整套配装合法。导入及切换规则后的配装问题需要显式显示。"
+      ],
+      "next": [
+        "让编辑阶段与保存、送入对战共用 Showdown 规则引擎，按当前规则和队伍上下文约束候选；不要只硬编码宝冠军或 OU。",
+        "兼顾未完成草稿：允许未填招式和未组满队伍，不能因此卡住后续编辑；完整合法性检查仍在保存/送入时执行。",
+        "检查 TeamValidator 的格式专属 validateSet、规则钩子及 validateForme 的自动规范化，校验副本以免误改草稿。",
+        "推荐配装也要校验与其他队友的组合约束；切换规则、文本导入、旧队伍加载后重新检测。",
+        "回归宝冠军道具重复/禁用道具/招式，厄诡椪面具和太晶，合法配装与不采用 Item Clause 的 OU 重复道具，其他世代和特殊规则。"
+      ],
+      "files": ["core/team-editor.cjs", "core/dex.cjs", "electron/play-teams.cjs", "ui/team-editor.js", "ui/play-teams.js", "tests/team-editor.test.cjs"],
+      "upstream": ["https://github.com/smogon/pokemon-showdown/blob/master/sim/team-validator.ts", "https://github.com/smogon/pokemon-showdown/blob/master/data/mods/champions/items.ts", "https://github.com/smogon/pokemon-showdown/blob/master/data/rulesets.ts"]
+    },
+    {
+      "title": "对局选招去掉额外确认",
+      "request": "点选招式即可；需要目标时选完目标提交；双打两只完成选择后提交。",
+      "confirmed": "electron/battle-choice.cjs 拦截 room.endTurn，把普通回合行动放进 pending，展示确认行动面板。这正是额外确认的来源。",
+      "next": ["移除普通回合的自定义确认拦截，恢复原生提交和撤销逻辑。", "选人阵容的确认是另一项此前明确要求，处理时不要误删。", "测试单打、双打、指定目标、群攻、换人、强制换人以及服务器允许时的撤销；更新 tests/doubles.e2e.cjs 中旧确认步骤。"],
+      "files": ["electron/battle-choice.cjs", "tests/doubles.e2e.cjs", "tests/battle-layout.e2e.cjs"]
+    },
+    {
+      "title": "部分情况下宝可梦贴图被拉长",
+      "status": "用户已提供截图；尚未复现和确认根因，不可声称已修复。",
+      "observations": ["core/battle-scale.cjs 的 spriteDimensions 本身用同一个 fit 缩放宽高。", "electron/play-battle.cjs 的 Dex.getSpriteData 在精确资源 metadata 缺失时回退到原生 data.w/data.h；需核对实际图片资源解析与尺寸回退是否一致。", "还需检查原生动画中的宽高变换、变身/换形态/替身/巨大化及 CSS，不能仅靠截图认定根因。"],
+      "next": ["用宽体、细长体型、不同性别/异色/形态复现，比较实际解码宽高与精灵数据和渲染宽高。", "修复实际失真来源，并验证待机、登场、攻击结束、换人及窗口缩放后的原始比例。"],
+      "files": ["core/battle-scale.cjs", "electron/play-battle.cjs", "assets/battle-media/manifest.json", "assets/battle-ui.css", "tests/presentation.test.cjs"]
+    }
+  ],
+  "verification": "本轮仅运行只读代码检查和 Node 复现脚本；没有实施修复、打包或安装。上一轮已验证的代码作为基线保留。"
+}
