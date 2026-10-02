@@ -1,4 +1,4 @@
-# Showdown 对战器 0.5.7
+# Showdown 对战器 0.5.8
 
 独立的中文 Pokémon Showdown 桌面客户端，包括在线对战、组队工坊、账号、战绩、分级规则和诊断日志。物理目录与安装包名使用 ShowdownBattler；不包含 AI 模型或训练功能。
 

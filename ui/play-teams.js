@@ -18,7 +18,7 @@ window.PlayTeams={
  async changeFormat(S,value){
   const revision=S.formatChangeRevision=(S.formatChangeRevision||0)+1;
   await this.capture(S,{tolerant:true});if(revision!==S.formatChangeRevision)return;
-  S.format=value;S.refreshFormat=null;invalidate(S);render();
+  S.format=value;invalidate(S);render();
   await api('team-draft',{save:true,...payload(S),name:S.draftName,id:S.editTeamId});
  },
  async action(S,b){
@@ -48,7 +48,7 @@ window.PlayTeams={
     case'team-import':{const text=await api('team-import');if(text!==null){Object.assign(S,{draft:text,positions:undefined,editTeamId:null,teamSlot:0,pendingEdits:{}});invalidate(S);render();}break;}
     case'team-export':{const file=await api('team-export',{text:S.draft});if(file)toast('队伍已导出');break;}
     case'team-text-apply':S.positions=undefined;S.teamSlot=0;invalidate(S);render();break;
-    case'team-resource-retry':S.refreshFormat=null;S.forceRefresh=true;window.DfyTeamEditor.refresh(S,api,render,toast);break;
+    case'team-resource-retry':S.forceRefresh=true;window.DfyTeamEditor.refresh(S,api,render,toast);break;
     case'team-clear-name':{
      const input=document.querySelector('[data-team-field=name]');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}
      if(S.teamEditorData?.sets?.[S.teamSlot]){const r=await api('team-editor-update',{...payload(S),patch:{name:''}});S.draft=r.text;S.positions=r.positions;window.DfyTeamEditor.clearPending(S,'name');invalidate(S);render();}break;

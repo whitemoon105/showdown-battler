@@ -3,6 +3,7 @@ const {fetch} = require('undici');
 const fs = require('node:fs');
 const path = require('node:path');
 const TTL = 6 * 60 * 60 * 1000;
+const RETRY_DELAY = 15 * 60 * 1000;
 const SCHEMA = 2;
 const pending = new Map();
 const indexes = new Map();
@@ -23,7 +24,7 @@ function cachedRecommendations(format, store) {
   return empty(format);
 }
 async function request(url, signal) {
-  const response = await fetch(url, {signal, headers: {'user-agent': 'ShowdownBattler/0.5.6'}});
+  const response = await fetch(url, {signal, headers: {'user-agent': 'ShowdownBattler/'+require('../package.json').version}});
   if (!response.ok) { await response.body?.cancel(); throw Error(`HTTP ${response.status}`); }
   let size = 0; const chunks = [];
   for await (const chunk of response.body) {
@@ -53,14 +54,16 @@ function parseUsage(raw, format, metadata = {}) {
   if (!Object.keys(stats).length) throw Error('统计数据为空');
   return {schema: SCHEMA, format, source: 'smogon', stats, dex: {}, ...metadata};
 }
-async function loadRecommendations(format, store, {force = false} = {}) {
+async function loadRecommendations(format, store, {force = false, timeoutMs = 12000} = {}) {
   format = normalize(format);
   const cached = cachedRecommendations(format, store);
-  if (!force && cached.fetchedAt && Date.now() - cached.fetchedAt < TTL) return cached;
+  if (!force && (cached.retryAt > Date.now() || (!cached.stale && !cached.networkIssue && cached.fetchedAt && Date.now() - cached.fetchedAt < TTL))) return cached;
   if (pending.has(format)) return pending.get(format);
   const job = (async () => {
-    const signal = AbortSignal.timeout(30000);
+    const signal = AbortSignal.timeout(timeoutMs);
     let result = null; let issue = '';
+    const samples = request(`https://play.pokemonshowdown.com/data/sets/${format}.json`, AbortSignal.any([signal, AbortSignal.timeout(3000)]))
+      .then(text => ({data: JSON.parse(text)})).catch(error => ({error: error.message}));
     try {
       const root = await index('https://www.smogon.com/stats/', signal);
       const months = [...new Set([...root.matchAll(/href="(\d{4}-\d{2})\//g)].map(x => x[1]))].sort().reverse();
@@ -78,20 +81,22 @@ async function loadRecommendations(format, store, {force = false} = {}) {
     // 保留理由：统计刷新失败时保留同规则的已验证快照，示例配装不能覆盖使用率数据。
     if (!result && cached.source !== 'unavailable') result = {...cached, stale: true, warning: '统计暂未更新，使用此规则已保存的数据。'};
     if (result && !result.stale && cached.dex) result.dex = cached.dex;
-    try {
-      const sourceUrl = `https://play.pokemonshowdown.com/data/sets/${format}.json`;
-      const data = JSON.parse(await request(sourceUrl, AbortSignal.timeout(3000)));
+    const sample = await samples;
+    if (sample.data) {
+      const data = sample.data;
       if (data.dex && data.stats) {
         result ||= empty(format);
         result.dex = data.dex;
         result.sampleStats = data.stats;
-        result.setsUrl = sourceUrl;
+        result.setsUrl = `https://play.pokemonshowdown.com/data/sets/${format}.json`;
         if (result.source === 'unavailable') result.source = 'showdown-sets';
       }
-    } catch (error) { issue ||= error.message; }
-    if (!result && cached.source !== 'unavailable') return {...cached, stale: true, warning: '网络暂不可用，使用此规则已保存的数据。'};
-    result ||= empty(format, '此规则暂未发布独立使用率；按当前规则分级浏览即可。');
+    } else { issue ||= sample.error; }
+    result ||= empty(format, issue ? '统计暂不可用，使用本地规则图鉴。' : '此规则暂未发布独立使用率；按当前规则分级浏览即可。');
     result.fetchedAt = result.stale ? cached.fetchedAt : Date.now();
+    result.checkedAt = Date.now();
+    // 保留理由：失败也记录检查时间，切换规则或重启不能反复请求不可达的数据源；手动刷新可重试。
+    result.retryAt = result.stale || issue ? Date.now() + RETRY_DELAY : 0;
     result.networkIssue = issue;
     store?.set(`recommendations-v${SCHEMA}-${format}`, result);
     return result;

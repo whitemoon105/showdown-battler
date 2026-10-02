@@ -11675,6 +11675,8 @@ var t = function (originalStr) {
 
 function translateNode(node) {
     if (node.tagName == 'SCRIPT') return;
+    // 保留理由：尊重组件已完成的本地化，避免把属性“超能力”再次翻译成招式“精神强念”。
+    if (node.parentElement?.closest('[translate="no"]')) return;
     var value = node.nodeValue;
     if (value.startsWith("If this move is successful, it deals damage or heals the target. 102/256 chance for")) node.nodeValue = "随机选择如下效果：102/256几率以40威力攻击对手；76/256几率以80威力攻击对手；26/256几率以120威力攻击对手；52/256几率回复对手1/4的最大HP(向下取整)。在第二世代使用礼物招式时，伤害计算公式中的等级、攻击、防御变量的值会发生改变。攻击的值会变为5（岩石属性或钢属性）或10（其他属性）。等级与防御的值由宝可梦的属性决定，其中等级会变为防御方宝可梦第二属性的内部编号，防御会变为攻击方宝可梦第二属性的内部编号（如果攻击方或防御方宝可梦只有一种属性，按照该宝可梦的第一属性计算）。各属性的内部编号如下：0=一般，1=格斗，2=飞行，3=毒，4=地面，5=岩石，7=虫，8=幽灵，9=钢，20=火，21=水，22=草，23=电，24=超能力，25=冰，26=龙，27=恶。";
     if (value.startsWith("The user spends two turns locked into this move and then, on the second turn after using this move, the user attacks the last Pokemon that hit")) node.nodeValue = "进入忍耐状态，2回合内无法使用其它招式、使用道具或交换宝可梦。第三回合以处于忍耐状态期间，上一次使用攻击招式对使用者造成伤害的对手所在场地的宝可梦为目标，对目标造成处于忍耐状态期间受到攻击招式的总伤害×2的伤害。该招式无法对没有效果的属性的宝可梦造成伤害，但忽略其它属性相克和属性一致加成且必定命中。";

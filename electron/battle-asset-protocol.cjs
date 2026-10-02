@@ -1,10 +1,11 @@
 'use strict';
 const {BattleAssets}=require('../core/battle-assets.cjs'),path=require('node:path'),fs=require('node:fs');
 let library;
+const atlases={'/atlas/items':['item-icons.png','image/png'],'/atlas/types':['type-icons.webp','image/webp']};
 async function setup(session,store){
  library||=new BattleAssets({directory:path.join(process.env.DFY_PLAY_CACHE||require('../core/paths.cjs').cache,'battle-media'),settings:()=>store.settings()});
  if(await session.protocol.isProtocolHandled('dfy-asset'))return;
- session.protocol.handle('dfy-asset',async request=>{try{const u=new URL(request.url);if(u.hostname!=='battle')return new Response('',{status:404});const asset=await library.get(u.pathname.slice(1));const size=asset.bytes.length,headers={'Content-Type':asset.type,'Content-Length':String(size),'Accept-Ranges':'bytes','Cache-Control':'public, max-age=3600','Access-Control-Allow-Origin':'*'},range=request.headers.get('Range');let bytes=asset.bytes,status=200;
+ session.protocol.handle('dfy-asset',async request=>{try{const u=new URL(request.url);if(u.hostname!=='battle')return new Response('',{status:404});const atlas=atlases[u.pathname],asset=atlas?{bytes:fs.readFileSync(path.join(__dirname,'../assets',atlas[0])),type:atlas[1]}:await library.get(u.pathname.slice(1));const size=asset.bytes.length,headers={'Content-Type':asset.type,'Content-Length':String(size),'Accept-Ranges':'bytes','Cache-Control':'public, max-age=3600','Access-Control-Allow-Origin':'*'},range=request.headers.get('Range');let bytes=asset.bytes,status=200;
   if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||!m[1]&&!m[2])return new Response(null,{status:416,headers:{'Content-Range':'bytes */'+size}});const start=m[1]?Number(m[1]):Math.max(0,size-Number(m[2])),end=m[1]&&m[2]?Math.min(size-1,Number(m[2])):size-1;if(start>=size||end<start)return new Response(null,{status:416,headers:{'Content-Range':'bytes */'+size}});bytes=bytes.subarray(start,end+1);status=206;headers['Content-Range']='bytes '+start+'-'+end+'/'+size;headers['Content-Length']=String(bytes.length);}
   return new Response(request.method==='HEAD'?null:new Uint8Array(bytes),{status,headers});}catch(error){if(/^\/sprite\//.test(new URL(request.url).pathname)){const bytes=fs.readFileSync(path.join(__dirname,'../assets/party-placeholder.svg'));return new Response(request.method==='HEAD'?null:new Uint8Array(bytes),{status:200,headers:{'Content-Type':'image/svg+xml','Content-Length':String(bytes.length),'Cache-Control':'public, max-age=3600'}});}return new Response('',{status:404});}});
 }

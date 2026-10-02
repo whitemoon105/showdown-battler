@@ -127,6 +127,7 @@ body[data-dfy-display=game] .dfy-choice-pool .dfy-game-action{min-height:60px;pa
 .dfy-choice-confirm{display:flex;align-items:center;gap:7px;position:sticky;bottom:0;padding:4px 0;background:#f7f9fc}.dfy-choice-note{flex:1;font-size:11px;color:#7389a4}
 body[data-dfy-display=game] .dfy-choice-confirm .dfy-game-action{padding:5px 13px;min-height:30px;font-size:11px}body[data-dfy-display=game] .dfy-game-command .dfy-choice-confirm [data-choice-action=confirm]:not(:disabled){background:#d55c75!important;border-color:#d55c75!important;color:white!important}
 .dfy-review-slot b{font-size:12px}
+.dfy-native-type{display:inline-flex;align-items:center;gap:2px;font:9px/14px 'Microsoft YaHei',sans-serif;white-space:nowrap;vertical-align:middle;margin-left:2px;padding:1px 3px;border-radius:3px;color:#fff}.dfy-native-type i{display:inline-block;width:14px;height:14px;background:url(dfy-asset://battle/atlas/types) no-repeat;background-size:14px 294px}
 
 .dfy-preview-pick{appearance:none;cursor:pointer;font:inherit;pointer-events:auto;color:#586e91;box-shadow:0 3px 0 #cbd6e7}.dfy-preview-pick[data-selected=true]{background:#e3f2ee!important;border-color:#71b99f!important}.dfy-preview-pick:hover:not(:disabled){background:#fff4f7!important;border-color:#d88596!important}.dfy-preview-pick:active{transform:translateY(2px)}.dfy-preview-pick:focus-visible{outline:2px solid #cf6986;outline-offset:3px}
 

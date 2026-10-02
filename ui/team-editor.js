@@ -4,6 +4,16 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const api=(method,payload)=>window.play.invoke(method,payload);
 const fieldKey=S=>S.format+'|'+S.teamSlot;
 const dataKey=S=>JSON.stringify([S.format,S.draft,S.positions,S.editorRevision||0]);
+function sourceLabel(S){
+ const cat=S.teamEditorData?.catalog||{},job=S.refreshStates?.[S.format];
+ const source=cat.recommendationMonth?'Smogon '+cat.recommendationMonth+' · '+(cat.recommendationRating??0)+' 分段':cat.recommendationSource==='showdown-sets'?'Showdown 示例配装':'本地规则图鉴';
+ return source+' · '+(job?.phase==='loading'?'正在检查新统计（可继续编辑）':job?.message||cat.recommendationWarning||(cat.recommendationMonth?'已载入本地统计':'离线可用'));
+}
+function paintRefresh(S){
+ if(S.page!=='teams')return;const status=document.querySelector('#team-data-source'),button=document.querySelector('[data-action=team-resource-retry]'),loading=S.refreshStates?.[S.format]?.phase==='loading';
+ if(status){status.textContent=sourceLabel(S);status.setAttribute('aria-busy',String(loading));}
+ if(button){button.disabled=loading;button.textContent=loading?'检查中…':'刷新统计';}
+}
 const tr=n=>window.__playState?.data?.dictionary?.[n]||n||'';
 const typeBadge=(t,iconOnly=false)=>'<span class="type-badge badge-'+String(t).toLowerCase()+(iconOnly?' icon-only':'')+'"><i class="type-symbol type-'+String(t).toLowerCase()+'" aria-hidden="true"></i>'+(iconOnly?'':'<span>'+esc(tr(t))+'</span>')+'</span>';
 const image=s=>'<img class="party-sprite" loading="lazy" src="dfy-asset://battle/'+esc(s.assetKey||'sprite/'+s.sprite+'/front/normal/M')+'" alt="'+esc(s.label||tr(s.species))+'">';
@@ -60,7 +70,7 @@ window.DfyTeamEditor={
   closeMenu();menus.clear();menuSerial=0;
   const data=S.teamEditorData,cat=data?.catalog||{},p=cat.profile||{},sets=data?.sets||Array(6).fill(null),slot=Math.max(0,Math.min(S.teamSlot||0,5)),set=sets[slot]||{},has=!!set.species;
   const total=Object.values(set.evs||{}).reduce((sum,n)=>sum+Number(n||0),0);
-  const source=cat.recommendationMonth?'Smogon '+cat.recommendationMonth+' · '+(cat.recommendationRating??0)+' 分段':cat.recommendationSource==='showdown-sets'?'Showdown 示例配装':cat.recommendationWarning||'本地规则图鉴';
+  const refreshing=S.refreshStates?.[S.format]?.phase==='loading';
   const nature=cat.natures?.find(n=>n.name===(set.nature||'Serious'));
   const range=(key,value,min,max)=>'<span class="stat-control"><input data-team-field="'+key+'" type="range" min="'+min+'" max="'+max+'" step="1" value="'+value+'" '+(!has?'disabled':'')+' aria-label="'+key+'"><output data-range-output="'+key+'">'+value+'</output></span>';
   const raw=S.pendingEdits?.[fieldKey(S)];
@@ -74,7 +84,7 @@ window.DfyTeamEditor={
   ].join('');
   return header('组队工坊','','<button data-action="team-new">新建队伍</button>')+
    '<section class="party-game"><div class="party-toolbar">'+field('队伍名称','<input id="team-name" value="'+esc(S.draftName)+'" placeholder="我的冒险队伍">')+field('对战规则',formatSelect())+'</div>'+
-   '<div class="party-data-status"><span id="team-data-source">'+esc(source)+'</span><button class="small ghost" data-action="team-resource-retry">刷新统计</button></div>'+
+   '<div class="party-data-status"><span id="team-data-source" role="status" aria-busy="'+!!refreshing+'">'+esc(sourceLabel(S))+'</span><button class="small ghost" data-action="team-resource-retry" '+(refreshing?'disabled':'')+'>'+(refreshing?'检查中…':'刷新统计')+'</button></div>'+
    '<nav class="party-slots" aria-label="六个队伍位置">'+sets.map((s,i)=>'<button type="button" data-editor="slot" data-slot="'+i+'" aria-pressed="'+(slot===i)+'" class="party-slot '+(slot===i?'selected':'')+'"><span class="party-slot-number">0'+(i+1)+'</span>'+(s?image(s):'<span class="party-empty-ball">＋</span>')+'<b>'+esc(s?.label||'添加伙伴')+'</b><small>'+esc(s?tr(s.item)||'未携带道具':'空位')+'</small></button>').join('')+'</nav>'+
    '<div class="party-editor" data-slot="'+slot+'"><aside class="party-portrait"><div class="party-habitat">'+(has?image(set):'<span class="party-empty-ball">＋</span>')+'</div><h3>'+esc(set.label||'选择你的伙伴')+'</h3><p>'+(set.types||[]).map(t=>typeBadge(t)).join(' ')+'</p>'+(set.legality?'<p class="tier-tag '+(set.legality.legal?'tier-legal':'tier-illegal')+'" title="'+esc(set.legality.reason)+'">'+esc(set.legality.tierLabel)+'</p>':'')+(has?'<button class="small ghost" data-editor="remove">移出队伍</button>':'')+'</aside>'+
    '<section class="party-loadout"><div class="party-section-heading"><h3>伙伴配置</h3><span>位置 '+(slot+1)+'</span></div><div class="party-fields">'+fields+'</div>'+
@@ -106,17 +116,19 @@ window.DfyTeamEditor={
   finally{if(S.teamEditorTicket===ticket)S.teamEditorLoading=null;}
  },
  async refresh(S,api,render,toast){
-  if(S.refreshFormat===S.format&&!S.forceRefresh)return;
-  const format=S.format,key=dataKey(S),ticket=Symbol();S.refreshTicket=ticket;S.refreshFormat=format;
-  const force=!!S.forceRefresh;S.forceRefresh=false;
-  const status=document.querySelector('#team-data-source');if(status)status.textContent+=' · 后台更新中';
+  const format=S.format,key=dataKey(S),force=!!S.forceRefresh;S.forceRefresh=false;S.refreshStates||={};
+  if(S.refreshStates[format]?.phase==='loading'||(S.refreshStates[format]&&!force)){paintRefresh(S);return;}
+  const job={phase:'loading',message:''};S.refreshStates[format]=job;paintRefresh(S);let timer;
   try{
-   const data=await api('team-editor-refresh',{text:S.draft,format,positions:S.positions,force});
-   if(S.refreshTicket!==ticket||S.format!==format||S.page!=='teams')return;
-   if(dataKey(S)===key&&!document.querySelector('.party-editor')?.dataset.dirty){
+   const data=await Promise.race([api('team-editor-refresh',{text:S.draft,format,positions:S.positions,force}),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('统计检查超时')),15000);})]);
+   job.phase=data.catalog.recommendationWarning?'cached':'ready';job.message=data.catalog.recommendationWarning||'统计已就绪';
+   if(S.format!==format||S.page!=='teams')return;
+   if(dataKey(S)===key&&!document.querySelector('.party-editor')?.dataset.dirty&&!document.querySelector('#team-text')?.dataset.dirty&&!active){
+    S.draftName=document.querySelector('#team-name')?.value??S.draftName;
     const scroll=document.querySelector('.teams-scroll')?.scrollTop||0;S.teamEditorData=data;render();document.querySelector('.teams-scroll')?.scrollTo(0,scroll);
-   }else if(status?.isConnected)status.textContent='当前规则统计已更新，下次选择时应用';
-  }catch(error){if(S.format===format){if(status?.isConnected)status.textContent='使用本地规则与已缓存统计';toast('统计更新暂不可用，组队可继续使用',true);}}
+   }else if(job.phase==='ready')job.message='统计已就绪，下次选择时应用';
+  }catch(error){job.phase='cached';job.message='统计暂未更新，已保留本地数据，可手动重试';}
+  finally{clearTimeout(timer);if(S.refreshStates[format]===job&&S.format===format)paintRefresh(S);}
  },
  async flush(S,api){
   const form=document.querySelector('.party-editor');if(!form?.dataset.dirty)return;

@@ -38,10 +38,10 @@ function mount(options={}){
  body[data-dfy-display=game] #room-teambuilder{background:linear-gradient(145deg,#f7f6f3,#f7f6f3)!important;color:#343944}
  body[data-dfy-display=game] #room-teambuilder .teamlist{max-width:1050px;margin:16px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
  body[data-dfy-display=game] #room-teambuilder .teamlist>li{border:3px solid #a4a9b4;border-radius:4px;background:#f7f6f3;box-shadow:4px 4px 0 #686d792b;padding:10px;list-style:none}
- body[data-dfy-display=game] #room-teambuilder .setchart{border:3px solid #686d79!important;border-radius:4px!important;background:#f7f6f3!important;box-shadow:4px 4px 0 #686d792b!important;margin-bottom:18px!important}
+ body[data-dfy-display=game] #room-teambuilder .setchart{border:3px solid #686d79!important;border-radius:4px!important;background-color:#f7f6f3!important;box-shadow:4px 4px 0 #686d792b!important;margin-bottom:18px!important}
  body[data-dfy-display=game] #room-teambuilder .setchart input{border-radius:2px!important;border-color:#d8dbe1!important;background:#f7f6f3!important;color:#343944!important}
  body[data-dfy-display=game] #room-teambuilder .setchart .setcell-pokemon{background:#d8dbe1!important;image-rendering:pixelated}
- body[data-dfy-display=game] #room-teambuilder .teambar button{border-radius:3px!important;background:#f7f6f3!important;border:2px solid #a4a9b4!important;image-rendering:pixelated}
+ body[data-dfy-display=game] #room-teambuilder .teambar button{border-radius:3px!important;background-color:#f7f6f3!important;border:2px solid #a4a9b4!important;image-rendering:pixelated}
  .dfy-game-particle{position:absolute;width:13px;height:13px;pointer-events:none;z-index:30;box-shadow:4px 4px 0 #ffffff55}
  body[data-dfy-display=game] .dfy-native-source{display:none!important}
  .dfy-game-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.dfy-game-buttons:empty{display:none}

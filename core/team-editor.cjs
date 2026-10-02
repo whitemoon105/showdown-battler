@@ -113,7 +113,7 @@ function read(text='',format='gen9ou',recommendation=null,positions) {
       recommendations:recommendationsFor(format,s.species,recommendation)};
   });
   return {format,sets:slots,positions:pos,catalog:{...cat,species,recommendationSource:recommendation?.source||'local',
-    recommendationWarning:recommendation?.warning||'',recommendationMonth:recommendation?.month||'',recommendationRating:recommendation?.rating,
+    recommendationWarning:recommendation?.warning||'',recommendationNetworkIssue:recommendation?.networkIssue||'',recommendationStale:!!recommendation?.stale,recommendationCheckedAt:recommendation?.checkedAt||0,recommendationMonth:recommendation?.month||'',recommendationRating:recommendation?.rating,
     recommendationUrl:recommendation?.sourceUrl||recommendation?.setsUrl||''}};
 }
 function update({text='',format='gen9ou',positions,index,patch={},remove=false}={}) {

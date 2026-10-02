@@ -17,6 +17,17 @@ function install({css='',dictionary={},assetMeta={}}={}){
   return{play,sync,setVolume,events,stop(room){if(owner===room.id){bgm?.pause();owner='';}},get music(){return{owner,track:bgm?.src,volume:bgm?.volume,master,paused:bgm?.paused,time:bgm?.currentTime,readyState:bgm?.readyState,error:bgm?.error?.message};}};
  })();
  const local=(p,front=true)=>{let species=typeof p==='string'?p:p.getSpeciesForme?.()||p.speciesForme||p.species;if(p.volatiles?.dynamax?.[1]&&!/-Gmax$/i.test(species))species+='-Gmax';const s=Dex.species.get(species);return'dfy-asset://battle/sprite/'+s.id+'/'+(front?'front':'back')+'/'+(p.shiny?'shiny':'normal')+'/'+(p.gender==='F'?'F':'M');};
+ // Native teambuilder portraits use CSS backgrounds, independently of battle sprites.
+ Dex.getTeambuilderSprite=function(p,dex,xOffset=0,yOffset=0){
+  if(!p)return'';const url=local(p),species=Dex.species.get(typeof p==='string'?p:p.species);
+  const meta=assetMeta[url.replace('dfy-asset://battle/','')]||assetMeta['sprite/'+species.id+'/front/normal/M'];
+  const width=meta?.width||96,height=meta?.height||96,scale=Math.min(90/width,72/height),w=width*scale,h=height*scale;
+  return 'background-image:url('+url+');background-position:'+(10+(96-w)/2+xOffset)+'px '+(22+(72-h)/2+yOffset)+'px;background-repeat:no-repeat;background-size:'+w+'px '+h+'px';
+ };
+ Dex.getItemIcon=function(item){const entry=Dex.items.get(typeof item==='string'?item:item?.name||item?.id),key='item/'+entry.id;if(assetMeta[key])return'background:transparent url(dfy-asset://battle/'+key+') center/24px 24px no-repeat';const num=entry.spritenum||0;return'background:transparent url(dfy-asset://battle/atlas/items) '+(-(num%16)*24)+'px '+(-Math.floor(num/16)*24)+'px no-repeat';};
+ const nativeType=Dex.getTypeIcon,typeOrder=['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'];
+ const typeLabels=['一般','格斗','飞行','毒','地面','岩石','虫','幽灵','钢','火','水','草','电','超能力','冰','龙','恶','妖精'],typeColors=['#929da3','#cf4968','#8098d0','#a45fb0','#cc8956','#b09f75','#8fa945','#726bb2','#60959f','#e8944e','#6097cc','#69aa65','#d8b645','#d9628a','#76b9aa','#4e72b6','#786777','#ce82c0'];
+ Dex.getTypeIcon=function(type,b){const index=typeOrder.indexOf(type);if(index<0)return nativeType.call(this,type,b);return'<span class="dfy-native-type" translate="no" title="'+typeLabels[index]+'" style="background-color:'+typeColors[index]+'"><i style="background-position:0 -'+(index*14)+'px"></i>'+typeLabels[index]+'</span>';};
  const oldSprite=Dex.getSpriteData;Dex.getSpriteData=function(p,front,options){
   const data=oldSprite.call(this,p,front,options);if(document.body.dataset.dfyDisplay!=='game')return data;
   const url=local(p,front),meta=assetMeta[url.replace('dfy-asset://battle/','')],species=Dex.species.get(typeof p==='string'?p:p.getSpeciesForme?.()||p.speciesForme||p.species);
