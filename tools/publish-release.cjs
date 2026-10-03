@@ -12,7 +12,7 @@ if(!credential.password)throw Error('Git credential unavailable');
 let dispatcher;try{const uri=git(['config','--get','http.proxy']);if(uri)dispatcher=new ProxyAgent({uri,headersTimeout:1800000,bodyTimeout:1800000});}catch{}
 async function api(endpoint,{method='GET',body,raw,headers={}}={}){
  const response=await fetch(endpoint.startsWith('https:')?endpoint:'https://api.github.com/'+endpoint,{method,dispatcher,signal:AbortSignal.timeout(1800000),duplex:raw?'half':undefined,headers:{Authorization:'Bearer '+credential.password,'User-Agent':'ShowdownBattler-release',Accept:'application/vnd.github+json',...(body?{'Content-Type':'application/json'}:{}),...headers},body:raw||(body?JSON.stringify(body):undefined)});
- if(response.status===404)return null;
+ if(response.status===404||response.status===204)return null;
  const value=await response.json();if(!response.ok)throw Error('GitHub '+response.status+': '+(value.message||'request failed'));return value;
 }
 async function digest(file,algorithm,encoding){const hash=crypto.createHash(algorithm);for await(const bytes of fs.createReadStream(file))hash.update(bytes);return hash.digest(encoding);}
@@ -43,9 +43,11 @@ async function verifyAssets(release,files){
   if(release.target_commitish!==commit)throw Error('Existing draft targets another commit');
   const remote=await api('repos/'+repo+'/releases/'+release.id+'/assets');
   for(const f of files){
-   const existing=remote.find(a=>a.name===f.name);if(existing){if(existing.size===f.size&&existing.digest==='sha256:'+f.sha256)continue;throw Error('Draft asset already exists with different content: '+f.name);}
-   console.log('Uploading '+f.name+' ('+Math.round(f.size/1048576)+' MiB)');let sent=0,last=0;const stream=fs.createReadStream(f.file);stream.on('data',bytes=>{sent+=bytes.length;if(Date.now()-last>15000){last=Date.now();console.log(f.name+': '+Math.round(sent/f.size*100)+'% read into upload stream');}});
-   const asset=await api(release.upload_url.replace(/\{.*$/,'')+'?name='+encodeURIComponent(f.name),{method:'POST',raw:stream,headers:{'Content-Type':'application/octet-stream','Content-Length':String(f.size)}});console.log('Uploaded '+asset.name);
+   const existing=remote.find(a=>a.name===f.name);if(existing){if(existing.size===f.size&&existing.digest==='sha256:'+f.sha256)continue;if(existing.state==='starter'&&existing.size===0)await api('repos/'+repo+'/releases/assets/'+existing.id,{method:'DELETE'});else throw Error('Draft asset already exists with different content: '+f.name);}
+   console.log('Uploading '+f.name+' ('+Math.round(f.size/1048576)+' MiB)');let sent=0,last=0;
+   // 保留理由：异步迭代保留流的背压，不能提前添加 data 监听导致连接就绪前丢掉安装包字节。
+   async function* chunks(){for await(const bytes of fs.createReadStream(f.file)){sent+=bytes.length;if(Date.now()-last>15000){last=Date.now();console.log(f.name+': '+Math.round(sent/f.size*100)+'% read into upload stream');}yield bytes;}}
+   const asset=await api(release.upload_url.replace(/\{.*$/,'')+'?name='+encodeURIComponent(f.name),{method:'POST',raw:chunks(),headers:{'Content-Type':'application/octet-stream','Content-Length':String(f.size)}});console.log('Uploaded '+asset.name);
   }
   await verifyAssets(release,files);console.log({draft:release.id,tag,commit});return;
  }
@@ -53,4 +55,4 @@ async function verifyAssets(release,files){
  if(release.draft)release=await api('repos/'+repo+'/releases/'+release.id,{method:'PATCH',body:{draft:false,prerelease:false,make_latest:'true'}});
  const latest=await api('repos/'+repo+'/releases/latest');if(latest?.tag_name!==tag)throw Error('Release is not the current public update');
  console.log({published:release.html_url,version:latest.tag_name,assets:latest.assets.map(a=>a.name)});
-})().catch(e=>{console.error(e.message);process.exitCode=1}).finally(()=>dispatcher?.close());
+})().catch(e=>{console.error(e.message,e.cause?.code||'');process.exitCode=1}).finally(()=>dispatcher?.close());
