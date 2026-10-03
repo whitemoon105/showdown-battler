@@ -1,0 +1,12 @@
+.dfy-trainer-intro.dfy-entry-title{position:absolute;inset:0;z-index:24;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10%;padding:24px 16%;box-sizing:border-box;pointer-events:none;overflow:hidden;background:linear-gradient(115deg,#fbf0f2eb 0 48%,#eaf2faeb 52% 100%);border:0;border-radius:0;box-shadow:none;max-width:none;transform:none;text-align:center;color:#45576c}
+.dfy-trainer-intro:before{content:'';position:absolute;top:0;left:50%;height:100%;width:2px;background:linear-gradient(transparent,#d8bd92,transparent);transform:skew(-15deg)}
+.dfy-intro-caption{position:absolute;top:14px;left:0;width:100%;font-size:11px;letter-spacing:.35em;color:#8894a8}
+.dfy-trainer-intro small{display:block;letter-spacing:.15em}.dfy-trainer-intro .dfy-intro-caption{color:#8894a8}
+.dfy-intro-trainer{position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;gap:5px}
+.dfy-intro-trainer .dfy-intro-avatar{display:block;width:clamp(72px,min(26cqw,48cqh),240px);height:clamp(72px,min(26cqw,48cqh),240px);max-height:calc(100% - 52px);object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 7px 5px #50607726)}
+.dfy-intro-trainer small{font-size:10px!important;font-weight:500;letter-spacing:.15em;color:#ba637b}.dfy-intro-trainer[data-side=far] small{color:#5c8cb0}
+.dfy-intro-trainer strong{font-size:clamp(13px,3cqw,24px);font-weight:750;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfy-trainer-intro .dfy-intro-vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:italic 800 clamp(30px,8cqw,74px)/1 system-ui;color:#c58e56;text-shadow:0 2px 0 #fff;letter-spacing:-3px}
+@media(max-height:750px){.dfy-trainer-intro.dfy-entry-title{padding:18px 10% 8px}.dfy-intro-caption{top:5px;font-size:9px}.dfy-intro-trainer{gap:2px}.dfy-intro-trainer strong{font-size:14px}}
+
+.dfy-game-arena{container-type:size;container-name:battle-arena}.dfy-intro-sweep{position:absolute;inset:-25% 0;width:42%;background:linear-gradient(90deg,transparent,#fff9,transparent);pointer-events:none}.dfy-intro-orbit{position:absolute;left:50%;top:50%;width:min(45cqw,70cqh);aspect-ratio:1;border:2px solid #dbb780;border-radius:50%;box-shadow:0 0 0 12px #ead2ac26;pointer-events:none}.dfy-intro-trainer,.dfy-intro-vs{z-index:2}.dfy-game-arena[data-intro=true] .dfy-active-hud{visibility:hidden}

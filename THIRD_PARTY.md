@@ -2,6 +2,8 @@
 
 - Pokémon Showdown 引擎：[smogon/pokemon-showdown](https://github.com/smogon/pokemon-showdown)，MIT。项目依赖为 artifacts/pokemon-showdown-0.11.11.tgz，实际依赖版本和校验值见 package-lock.json。保留依赖的 LICENSE。
 - 在线客户端及对战动画：[pokemon-showdown-client](https://github.com/smogon/pokemon-showdown-client)。应用加载官方客户端，沿用连接、对战协议、选招控件与原生动画事件，另作本地界面适配。
+- 开场训练家头像来自 [Showdown trainers](https://play.pokemonshowdown.com/sprites/trainers/)，本地收录 1,500 张；逐文件来源、尺寸、哈希见 assets/trainers/manifest.json。玩家自定义头像沿用服务器提供的 HTTPS 地址，无法加载时显示中性占位头像。
+- 自动组队的候选还包括 [Smogon 官方示例队伍索引](https://www.smogon.com/forums/threads/master-list-of-ps-sample-teams.3777422/) 指向的公开队伍配置；assets/sample-teams.json 逐队保存规则、原帖、Poképaste 地址和作者。当前收录 38 个赛制的 114 支完整合法示例，只提取配队数据，不嵌入 Smogon 网页。内置冠军入门配置为本项目整理，通用生成器另从当前规则构建合法候选。
 - 数值使用率：[Smogon stats](https://www.smogon.com/stats/)。示例配装：[Showdown data/sets](https://play.pokemonshowdown.com/data/sets/gen9ou.json)。每份 assets/recommendations/*.json 记录具体规则、数据 URL、月份及分段；不把独立边际使用率组合宣称为官方完整示例配装。
 - Pokémon 图像优先使用[神奇宝贝百科](https://wiki.52poke.com/)；属性图集来自 [MediaWiki:Common.css](https://wiki.52poke.com/wiki/MediaWiki:Common.css) 使用的 MST_SV.webp，来源记录在 assets/type-icons-source.json。逐文件 URL、实际图像类型与动画信息见 assets/battle-media/manifest.json。
 - 缺少对应神百形态图时使用 [Showdown sprites](https://github.com/smogon/sprites)，道具图集来自 play.pokemonshowdown.com/sprites/itemicons-sheet.png。另保留已有 [PokéAPI sprites](https://github.com/PokeAPI/sprites) 道具图和 [PokéAPI cries](https://github.com/PokeAPI/cries) 叫声。

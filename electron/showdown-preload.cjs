@@ -1,6 +1,6 @@
 'use strict';
 const {ipcRenderer,webFrame}=require('electron');
-window.addEventListener('dfy:navigate',event=>{if(['accounts','teams'].includes(event.detail))ipcRenderer.send('dfy:showdown-navigate',event.detail);});
+window.addEventListener('dfy:navigate',event=>{if(['accounts','teams','rules'].includes(event.detail))ipcRenderer.send('dfy:showdown-navigate',event.detail);});
 // webContents.executeJavaScript waits for every remote image to finish loading.
 // Run at DOM readiness in the page's main world instead, before revealing the view.
 window.addEventListener('DOMContentLoaded',async()=>{

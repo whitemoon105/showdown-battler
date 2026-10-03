@@ -19,7 +19,7 @@ test('statistics outage preserves same-format usage when fresh sample sets succe
 
 test('standalone store keeps all files inside chosen data root and drops obsolete settings',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'showdown-store-'));
- try{const store=new Store(dir);store.set('settings',{proxy:'127.0.0.1:9999',provider:'old',audioVolume:30});assert.equal(store.settings().proxy,undefined);assert.equal(store.settings().provider,undefined);assert.equal(store.settings().audioVolume,30);store.saveSettings({audioMuted:true});assert(!('proxy' in store.get('settings')));assert.equal(path.dirname(store.file('policy-example')),dir);assert.throws(()=>store.file('../escape'));}
+ try{const store=new Store(dir);store.set('settings',{proxy:'127.0.0.1:9999',provider:'old',audioVolume:30});assert.equal(store.settings().proxy,undefined);assert.equal(store.settings().provider,undefined);assert.equal(store.settings().bgmVolume,30);assert.equal(store.settings().effectsVolume,30);store.saveSettings({audioMuted:true});assert(!('proxy' in store.get('settings')));assert.equal(path.dirname(store.file('policy-example')),dir);assert.throws(()=>store.file('../escape'));}
  finally{fs.rmSync(dir,{recursive:true});}
 });
 

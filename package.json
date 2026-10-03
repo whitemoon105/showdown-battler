@@ -1,6 +1,6 @@
 {
   "name": "showdown-battler",
-  "version": "0.5.9",
+  "version": "0.6.0",
   "description": "Showdown对战器 · 账号、战绩与随机对战",
   "main": "electron/play-main.cjs",
   "author": "白月遥",

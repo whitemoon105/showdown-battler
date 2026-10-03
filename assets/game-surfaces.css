@@ -1,0 +1,13 @@
+/* 保留理由：在异步适配前隐藏原网页，避免切页、登录报错和弹窗闪出原始样式。 */
+body[data-dfy-display=game] .ps-popup:not(.dfy-popup){visibility:hidden!important}
+body[data-dfy-display=game] .ps-room:not(#room-):not([id^=room-battle-])>:not(.dfy-room-surface){display:none!important}
+body[data-dfy-display=web] .dfy-room-surface{display:none!important}
+body[data-dfy-display=game] .dfy-room-surface{box-sizing:border-box;padding:24px;min-height:100%;color:#465972;background:#eff3f9;font:14px/1.65 'Microsoft YaHei',sans-serif}
+.dfy-room-surface>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.dfy-room-surface h2{font-size:23px;margin:0}.dfy-room-content{background:#fff;border:1px solid #dee5ef;border-radius:18px;padding:22px;overflow:auto}.dfy-room-content table{border-collapse:collapse;width:100%;text-align:left}.dfy-room-content th,.dfy-room-content td{padding:10px;border-bottom:1px solid #e8ecf4}.dfy-room-content tr:nth-child(even){background:#f7f9fc}.dfy-room-content ul{padding-left:22px}
+body[data-dfy-display=game] .dfy-room-surface button,body[data-dfy-display=game] .ps-popup.dfy-popup button,body[data-dfy-display=game] .battle-log-add button{border:1px solid #dce3ef!important;border-radius:10px!important;padding:9px 14px;background:#fff!important;color:#465972!important;font:inherit;box-shadow:0 3px 0 #dce2ec;cursor:pointer;white-space:normal;max-width:100%;margin:4px}
+body[data-dfy-display=game] .dfy-room-surface button:hover,body[data-dfy-display=game] .ps-popup.dfy-popup button:hover,body[data-dfy-display=game] .battle-log-add button:hover{background:#fff3f6!important;border-color:#db7890!important}
+body[data-dfy-display=game] .dfy-room-surface button:active,body[data-dfy-display=game] .ps-popup.dfy-popup button:active{transform:translateY(2px);box-shadow:0 1px 0 #dce2ec}
+.dfy-surface-input,body[data-dfy-display=game] .ps-popup.dfy-popup input:not([type=checkbox]):not([type=radio]),body[data-dfy-display=game] .ps-popup.dfy-popup select{box-sizing:border-box;max-width:100%;padding:10px;border:1px solid #dce3ef;border-radius:9px;background:#f8faff;color:#465972;font:inherit}
+body[data-dfy-display=game] .ps-popup.dfy-popup{font:14px/1.65 'Microsoft YaHei',sans-serif;color:#465972}
+body[data-dfy-display=game] .ps-popup .message-error{background:#fff0f3;color:#af3452;border-radius:10px;padding:12px}
+body[data-dfy-display=game] .dfy-room-surface button:disabled{cursor:not-allowed;opacity:.5}

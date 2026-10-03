@@ -12,11 +12,11 @@ function spriteDimensions({width,height,heightm=1.5,front=true,gen=9,doubles=fal
 }
 // The whole scene shares one transform, including platforms and weather. Fit the
 // stable silhouettes between the HUD columns; attacks never drive the camera.
-function battleCamera({width,height,bounds=[],leftInset=0,rightInset=0,doubles=false}){
+function battleCamera({width,height,bounds=[],leftInset=0,rightInset=0,topInset=0,bottomInset=0,centered=false,doubles=false}){
  const valid=bounds.filter(b=>Number.isFinite(b.x+b.y+b.w+b.h)&&b.w>0&&b.h>0);
  const x1=Math.min(doubles?90:140,...valid.map(b=>b.x))-18,x2=Math.max(doubles?590:540,...valid.map(b=>b.x+b.w))+18;
  const y1=Math.min(125,...valid.map(b=>b.y))-28,y2=Math.max(360,...valid.map(b=>b.y+b.h))+8;
- const area=Math.max(180,width-leftInset-rightInset),scale=Math.max(.1,Math.min(area/(x2-x1),Math.max(80,height-20)/(y2-y1),2.1));
- return {scale,left:leftInset+area/2-(x1+x2)*scale/2,top:height-10-y2*scale};
+ const area=Math.max(1,width-leftInset-rightInset),room=Math.max(1,height-topInset-bottomInset-20),scale=Math.max(.01,Math.min(area/(x2-x1),room/(y2-y1),2.1));
+ return {scale,left:leftInset+area/2-(x1+x2)*scale/2,top:centered?topInset+10+(room-(y2-y1)*scale)/2-y1*scale:height-bottomInset-10-y2*scale};
 }
 module.exports={spriteDimensions,battleCamera};

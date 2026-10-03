@@ -75,11 +75,15 @@ function mount(options={}){
   const signature=nodes.map(n=>[n.name,n.value,n.name==='openTimer'?'timer':n.textContent,n.disabled,n.checked,n.className].join('|')).join('\n');
   if(state.signature===signature&&nodes.every((n,i)=>n.name==='openTimer'||state.nodes?.[i]===n))return;
   state.signature=signature;state.nodes=nodes;target.replaceChildren();
+  // 原生请求可能先于下一帧替换控件；保留理由：同一语义的按钮应仍可单击，且不能把旧招式点击发给不同的新行动。
+  const key=n=>{const index=n.dataset.tooltip?.match(/^(?:switchpokemon|pokemon)\|(\d+)$/)?.[1],p=index===undefined?null:state.scene?.battle?.myPokemon?.[Number(index)];return[n.tagName,n.type,n.name,n.value,n.dataset.move||'',n.dataset.tooltip||'',p?.ident||'',p?.details||p?.speciesForme||''].join('|');};
+  const current=(n,expected)=>{const live=n.isConnected&&key(n)===expected?n:[...source.querySelectorAll('button,input[type=checkbox]')].find(x=>key(x)===expected);if(!live||live.disabled||live.classList.contains('disabled')){queue();return null;}for(let p=live;p&&p!==source;p=p.parentElement)if(p.hidden||getComputedStyle(p).display==='none'){queue();return null;}return live;};
   for(const native of nodes){
    if(dual&&['selectMove','selectSwitch'].includes(native.name))continue;
+   const expected=key(native);
    if(native.type==='checkbox'){
     const label=element('label','dfy-game-check'),check=document.createElement('input');check.type='checkbox';check.dataset.nativeToggle=native.name;check.checked=native.checked;check.disabled=native.disabled;label.append(check,document.createTextNode(({terastallize:'太晶化',megaevo:'超级进化',zmove:'Ｚ招式',dynamax:'极巨化'})[native.name]||zh(native.closest('label')?.textContent?.trim()||native.name)));
-    check.addEventListener('click',e=>{e.stopPropagation();if(native.isConnected&&!native.disabled)native.click();queue();});target.append(label);continue;
+    check.addEventListener('click',e=>{e.stopPropagation();const live=current(native,expected);if(live&&live.checked!==check.checked)live.click();queue();});target.append(label);continue;
    }
    const button=element('button','dfy-game-action');button.type='button';button.dataset.nativeAction=native.name||'';button.dataset.nativeValue=native.value;button.disabled=native.disabled||native.classList.contains('disabled');
    const switchIndex=native.dataset.tooltip?.match(/^(?:switchpokemon|pokemon)\|(\d+)$/)?.[1];
@@ -90,13 +94,13 @@ function mount(options={}){
    if(['chooseSwitch','chooseTeamPreview','chooseMoveTarget','chooseSwitchTarget'].includes(action)){label=zh(native.childNodes.length?[...native.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():text)||label;}
    button.append(element('span','',label));
    if(move){const m=window.Dex?.moves.get(move);button.style.setProperty('--move-color',colors[m?.type]||colors.Normal);button.append(element('small','',(zh(m?.type)||'')+' · '+(native.querySelector('.pp')?.textContent||'')));}
-   else if(action==='format')button.append(element('small','',zh(text)));
+   else if(action==='format'){button.append(element('small','',zh(text)));button.dataset.ruleFormat=native.value;}
    else if(action==='team'){
     const team=window.Storage?.teams?.[window.app?.rooms?.['']?.curTeamIndex];
     button.append(element('small','',team?.name||'选择一支出战队伍'));
     if(team){const row=element('span','dfy-team-miniatures');for(const p of Storage.unpackTeam(team.team)||[]){const img=element('img','');img.src='dfy-asset://battle/sprite/'+Dex.species.get(p.species).id+'/front/normal/M';img.alt=zh(p.species);img.title=zh(p.species);row.append(img);}button.append(row);}
    }
-   button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!native.isConnected||native.disabled)return;if(playEdition&&mode==='game'&&((action==='joinRoom'&&native.value==='teambuilder')||action==='login')){window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:action==='login'?'accounts':'teams'}));return;}if(action==='team'&&window.__dfyLobby){window.__dfyLobby.chooseTeam(native,button);}else native.click();queue();});
+   button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const live=current(native,expected);if(!live)return;if(playEdition&&mode==='game'&&((action==='joinRoom'&&['teambuilder','resources'].includes(live.value))||action==='login')){window.dispatchEvent(new CustomEvent('dfy:navigate',{detail:action==='login'?'accounts':live.value==='resources'?'rules':'teams'}));return;}if(action==='team'&&window.__dfyLobby){window.__dfyLobby.chooseTeam(live,button);}else live.click();queue();});
    target.append(button);
   }
  }

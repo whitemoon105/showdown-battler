@@ -6,7 +6,7 @@ const invalidate=S=>{S.teamEditorData=null;S.teamEditorKey=null;S.teamEditorLoad
 const payload=S=>({text:S.draft,format:S.format,positions:S.positions,index:S.teamSlot});
 window.PlayTeams={
  init(S){if(S.draft!==undefined)return;const d=S.data.teamDraft||{};Object.assign(S,{draft:d.text||'',draftName:d.name||'',format:d.format||'gen9ou',positions:d.positions,editTeamId:d.id||null,teamSlot:0});},
- render(S){this.init(S);return window.DfyTeamEditor.render(S,{esc,header:(title,sub,actions)=>'<header class="page-head"><div><h1>'+title+'</h1><p>按对战规则选择伙伴、配装，保存后即可送入对战。</p></div><div class="head-actions"><button class="ghost" data-page="battle">返回对战</button>'+actions+'</div></header><div class="page-scroll teams-scroll">',field:(label,html)=>'<label><span>'+label+'</span>'+html+'</label>',formatSelect:()=>'<select id="team-format" aria-label="队伍规则">'+S.data.formats.filter(f=>!f.random).map(f=>'<option value="'+esc(f.id)+'" '+(f.id===S.format?'selected':'')+'>'+esc(window.__playFormatName?.(f.name)||f.name)+'</option>').join('')+'</select>'})+'</div>';},
+ render(S){this.init(S);return window.DfyTeamEditor.render(S,{esc,header:(title,sub,actions)=>'<header class="page-head"><div><h1>'+title+'</h1><p>按对战规则选择伙伴、配装，保存后即可送入对战。</p></div><div class="head-actions"><button class="ghost" data-page="battle">返回对战</button>'+actions+'</div></header><div class="page-scroll teams-scroll">',field:(label,html)=>'<label><span>'+label+'</span>'+html+'</label>',formatSelect:()=>'<button type="button" id="team-format-button" data-action="team-format-menu" data-rule-format="'+esc(S.format)+'" aria-haspopup="listbox">'+esc(window.__playFormatName?.(S.data.formats.find(f=>f.id===S.format)?.name||S.format))+'<span>⌄</span></button><small class="format-hint">悬停查看规则，展开后可逐项预览</small>'})+'</div>';},
  async prepare(S){await window.DfyTeamEditor.prepare(S,api,render,toast);},
  async capture(S,{tolerant=false}={}){
   if(S.page!=='teams')return;this.init(S);
@@ -27,6 +27,9 @@ window.PlayTeams={
   if(S.teamActionBusy)return true;
   S.teamActionBusy=true;
   try{
+   if(a==='team-format-menu'){window.__dfyRuleTips.chooseFormats({options:S.data.formats.filter(f=>!f.random).map(f=>({id:f.id,label:window.__playFormatName(f.name)})),value:S.format,button:b,onChange:value=>this.changeFormat(S,value).catch(e=>toast(e.message,true))});return true;}
+   if(a==='team-start-blank'){Object.assign(S,{draft:'',draftName:'',blankTeam:true,positions:[],editTeamId:null,teamSlot:0,pendingEdits:{}});invalidate(S);await api('team-draft',{save:true,...payload(S),name:'',id:null});render();return true;}
+   if(a==='team-new'){S.generatingTeam=true;render();try{const format=S.format,t=await api('team-generate',{format,previous:S.draft});if(S.format!==format)return true;Object.assign(S,{draft:t.text,draftName:t.name,positions:undefined,editTeamId:null,teamSlot:0,pendingEdits:{},blankTeam:false});invalidate(S);await api('team-draft',{save:true,...payload(S),name:S.draftName,id:null});toast('已生成完整合法队伍，可直接保存出战');}finally{S.generatingTeam=false;render();}return true;}
    if(editor==='slot'){await this.capture(S,{tolerant:true});S.teamSlot=Number(b.dataset.slot);render();return true;}
    const discard=editor==='remove'||['team-clear-species','team-clear-name','team-new','team-load','team-resource-retry'].includes(a);
    if(!discard)await this.capture(S);
@@ -35,7 +38,6 @@ window.PlayTeams={
    }
    if(editor==='apply'){render();return true;}
    switch(a){
-    case'team-new':Object.assign(S,{draft:'',draftName:'',positions:[],editTeamId:null,teamSlot:0,pendingEdits:{}});invalidate(S);render();break;
     case'team-load':{const t=S.data.teams.find(t=>t.id===b.dataset.id);if(!t)throw Error('队伍不存在');Object.assign(S,{draft:t.text,draftName:t.name,format:t.format,positions:t.positions,editTeamId:t.id,teamSlot:0,pendingEdits:{}});invalidate(S);render();break;}
     case'team-delete':await modal('<h2>删除这支队伍？</h2><p>只删除本机队伍盒中的记录。</p><div class="dialog-actions"><button data-action="close">取消</button><button class="danger" data-action="team-delete-confirm" data-id="'+esc(b.dataset.id)+'">删除</button></div>');break;
     case'team-delete-confirm':S.data.teams=await api('team-delete',{id:b.dataset.id});document.querySelector('#dialog').close();render();break;
@@ -63,5 +65,4 @@ window.PlayTeams={
   }finally{S.teamActionBusy=false;}
  }
 };
-document.addEventListener('change',async e=>{if(e.target.id!=='team-format')return;try{await PlayTeams.changeFormat(window.__playState,e.target.value);}catch(error){toast(error.message,true);}});
 })();

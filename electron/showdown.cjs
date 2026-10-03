@@ -7,7 +7,7 @@ class ShowdownViews {
     ipcMain.handle('dfy:showdown-bootstrap',event=>{if(!entry(event))throw Error('未知对战页面');return this.presentation?.()||'';});
     this.readyListener=(event,error)=>{const row=entry(event);if(!row)return;const [server,view]=row;if(error){this.log?.('showdown.bootstrap-failed',{server,error});this.send({type:'web-status',server,error:'对战界面加载失败：'+error});return;}view.presentationReady=true;this.layout({visible:this.visible});Promise.resolve(this.translate(view)).catch(e=>{this.log?.('showdown.translate-failed',{server,error:e.message});this.send({type:'web-status',server,error:e.message});});};
     ipcMain.on('dfy:showdown-ready',this.readyListener);
-    this.navigateListener=(event,page)=>{if(entry(event)&&['accounts','teams'].includes(page))this.send({type:'navigate',page});};
+    this.navigateListener=(event,page)=>{if(entry(event)&&['accounts','teams','rules'].includes(page))this.send({type:'navigate',page});};
     ipcMain.on('dfy:showdown-navigate',this.navigateListener);
   }
   checkIpLock(server,url){
@@ -46,9 +46,11 @@ class ShowdownViews {
     this.active=server;this.layout({visible:true,bounds:this.bounds});return{opened:true,server,embedded:true};
   }
   layout({visible,bounds}){
-    if(bounds){const size=this.main.getContentBounds();const x=Math.max(0,Math.round(bounds.x)),y=Math.max(0,Math.round(bounds.y));this.bounds={x,y,width:Math.max(1,Math.min(Math.round(bounds.width),size.width-x)),height:Math.max(1,Math.min(Math.round(bounds.height),size.height-y))};}
+    // 保留理由：页面回传 CSS 像素，原生子窗口使用 DIP；缩放只能换算一次，否则放大后战场被重复缩小。
+    if(bounds)this.bounds={...bounds};
+    const nativeBounds=this.bounds?require('../core/view-bounds.cjs').viewBounds(this.bounds,this.main.getContentBounds(),this.main.webContents.getZoomFactor()):null;
     this.visible=!!visible;
-    for(const [server,view]of this.views){if(this.bounds)view.setBounds(this.bounds);view.setVisible(this.visible&&!!this.bounds&&server===this.active&&view.presentationReady!==false);}
+    for(const [server,view]of this.views){if(nativeBounds)view.setBounds(nativeBounds);view.setVisible(this.visible&&!!nativeBounds&&server===this.active&&view.presentationReady!==false);}
     return{server:this.active,visible:this.visible};
   }
   async reload(){const view=this.views.get(this.active);if(view)view.webContents.reload();return{};}

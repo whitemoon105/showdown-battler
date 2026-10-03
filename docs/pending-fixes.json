@@ -1,66 +1,71 @@
 {
-  "savedAt": "2026-10-02",
-  "status": "用户要求先记录、后续再改；已汇总六项待办并保留前三项的初步定位，尚未修改功能代码。",
-  "baselineCommit": "572c4528400d0f46872eab9b8d58913c2314830c",
+  "savedAt": "2026-10-04",
+  "status": "历史待办已实现，本轮回归通过；实现和验证记录见 beauty-handoff-20261003.md。",
+  "baselineCommit": "160fdb4e88c6ad6ca605cdaa94a722017d9dd8a3",
   "deliveryPreference": {
-    "instruction": "后续完成修复并验证后同步 Git；用户此前明确不再打包。",
-    "保留理由": "保留用户最近确认的交付范围，避免恢复任务时自行打包或安装。"
+    "instruction": "发布 0.6.0 更新包并同步 Git；不自动安装到本机。",
+    "保留理由": "用户最新明确要求推送更新包，取代此前仅同步源码的范围。"
   },
   "tasks": [
     {
-      "title": "组队规则约束应覆盖道具、招式、形态、太晶及队伍组合",
-      "userExamples": ["宝冠军限定可用道具及招式，并禁止重复携带同一道具", "OU 中厄诡椪的面具和太晶属性限制"],
-      "confirmed": [
-        "core/team-editor.cjs 的 update 只检查候选名称、单项招式可学习性、基础特性及数值，没有执行完整配装与队伍组合校验。",
-        "已复现：gen9ou 下 Ogerpon-Wellspring 可以通过 editor.update 设置 Leftovers、Fire 太晶及 Ivy Cudgel。",
-        "同一文本交给 core/dex.cjs 的 validate 后，Showdown TeamValidator 正确返回缺 Wellspring Mask、太晶必须 Water 等错误。",
-        "electron/play-teams.cjs 的 team-save 和 web-team 已有完整 validateTeam 门禁，不能误称所有保存/出战路径完全没有校验。",
-        "道具候选已调用当前规则的 checkItem，但没有结合选中形态的 requiredItems 或队友所持道具；太晶候选使用全局 cat.types。",
-        "gen9championsvgc2026regmc 使用 champions mod，规则表包含 itemclause，valueRules.get('itemclause') 为 1。",
-        "read 的 legality 目前主要是 speciesStatus，不能说明整套配装合法。导入及切换规则后的配装问题需要显式显示。"
-      ],
-      "next": [
-        "让编辑阶段与保存、送入对战共用 Showdown 规则引擎，按当前规则和队伍上下文约束候选；不要只硬编码宝冠军或 OU。",
-        "兼顾未完成草稿：允许未填招式和未组满队伍，不能因此卡住后续编辑；完整合法性检查仍在保存/送入时执行。",
-        "检查 TeamValidator 的格式专属 validateSet、规则钩子及 validateForme 的自动规范化，校验副本以免误改草稿。",
-        "推荐配装也要校验与其他队友的组合约束；切换规则、文本导入、旧队伍加载后重新检测。",
-        "回归宝冠军道具重复/禁用道具/招式，厄诡椪面具和太晶，合法配装与不采用 Item Clause 的 OU 重复道具，其他世代和特殊规则。"
-      ],
-      "files": ["core/team-editor.cjs", "core/dex.cjs", "electron/play-teams.cjs", "ui/team-editor.js", "ui/play-teams.js", "tests/team-editor.test.cjs"],
-      "upstream": ["https://github.com/smogon/pokemon-showdown/blob/master/sim/team-validator.ts", "https://github.com/smogon/pokemon-showdown/blob/master/data/mods/champions/items.ts", "https://github.com/smogon/pokemon-showdown/blob/master/data/rulesets.ts"]
+      "title": "组队道具、招式、形态、太晶及队伍组合校验",
+      "status": "已实现并完成针对性验证",
+      "result": "编辑器候选与保存共用 TeamValidator；校验副本，允许未完成草稿和逐项修复。",
+      "evidence": "tests/team-editor.test.cjs"
     },
     {
-      "title": "对局选招去掉额外确认",
-      "request": "点选招式即可；需要目标时选完目标提交；双打两只完成选择后提交。",
-      "confirmed": "electron/battle-choice.cjs 拦截 room.endTurn，把普通回合行动放进 pending，展示确认行动面板。这正是额外确认的来源。",
-      "next": ["移除普通回合的自定义确认拦截，恢复原生提交和撤销逻辑。", "选人阵容的确认是另一项此前明确要求，处理时不要误删。", "测试单打、双打、指定目标、群攻、换人、强制换人以及服务器允许时的撤销；更新 tests/doubles.e2e.cjs 中旧确认步骤。"],
-      "files": ["electron/battle-choice.cjs", "tests/doubles.e2e.cjs", "tests/battle-layout.e2e.cjs"]
+      "title": "普通选招去掉额外确认",
+      "status": "已实现并完成针对性验证",
+      "result": "单打选完提交，双打完成两只及必要目标后提交；选人确认和服务器允许的撤销保留。",
+      "evidence": "tests/battle-presentation.e2e.cjs、tests/doubles.e2e.cjs"
     },
     {
-      "title": "部分情况下宝可梦贴图被拉长",
-      "status": "用户已提供截图；尚未复现和确认根因，不可声称已修复。",
-      "observations": ["core/battle-scale.cjs 的 spriteDimensions 本身用同一个 fit 缩放宽高。", "electron/play-battle.cjs 的 Dex.getSpriteData 在精确资源 metadata 缺失时回退到原生 data.w/data.h；需核对实际图片资源解析与尺寸回退是否一致。", "还需检查原生动画中的宽高变换、变身/换形态/替身/巨大化及 CSS，不能仅靠截图认定根因。"],
-      "next": ["用宽体、细长体型、不同性别/异色/形态复现，比较实际解码宽高与精灵数据和渲染宽高。", "修复实际失真来源，并验证待机、登场、攻击结束、换人及窗口缩放后的原始比例。"],
-      "files": ["core/battle-scale.cjs", "electron/play-battle.cjs", "assets/battle-media/manifest.json", "assets/battle-ui.css", "tests/presentation.test.cjs"]
+      "title": "变体素材拉伸",
+      "status": "已实现并完成针对性验证",
+      "result": "资源解析与尺寸读取使用同一回退链；统一等比缩放。缺少素材仍可能回退普通或正面图。",
+      "evidence": "tests/presentation.test.cjs、tests/battle-layout.e2e.cjs"
     },
     {
-      "title": "鼠标悬停在招式上不显示招式效果",
-      "request": "鼠标悬停在招式按钮上时显示具体效果。",
-      "status": "用户反馈，尚未复现或定位。",
-      "next": ["检查对局招式按钮的悬停提示是否被自定义界面遗漏或遮挡，并核对组队招式选择中的效果提示。", "显示当前招式对应的中文效果；提示卡不遮挡操作，移开后关闭，并在单打、双打及小窗口中验证。"]
+      "title": "招式中文悬停",
+      "status": "已实现并完成针对性验证",
+      "result": "真实鼠标触发紧凑效果卡，跟随当前世代，移出、点击及滚动时关闭。",
+      "evidence": "tests/battle-layout.e2e.cjs"
     },
     {
-      "title": "BGM 与音效分别调整音量",
-      "request": "背景音乐和音效使用独立音量设置。",
-      "status": "待实现；本次仅记录。",
-      "next": ["分别控制背景音乐与叫声、登场、招式、命中等音效，调整一类时不影响另一类。", "保存两类音量偏好，检查静音、切换页面或对局、重启后的行为。"]
+      "title": "独立 BGM 和音效音量",
+      "status": "已实现并完成针对性验证",
+      "result": "分别保存和实时控制，迁移旧音量，统一静音不丢失设置。",
+      "evidence": "tests/audio-results.test.cjs、tests/audio-results.e2e.cjs"
     },
     {
-      "title": "胜利后缺少特效",
-      "request": "增加对战胜利后的反馈与特效。",
-      "status": "用户反馈，尚未检查现有结算事件与表现。",
-      "next": ["按服务器确认的对局结果触发胜利演出，区分胜利、失败、平局和观战。", "避免重复播放或遮挡结算与后续操作；音效接入独立音效音量，并兼顾减少动态效果设置。"]
+      "title": "胜负平结算及训练家 VS 开场",
+      "status": "已实现并完成针对性验证",
+      "result": "服务器确认结果后播放，去重，观战不冒充获胜，支持减少动态效果。开场沿用单球时间线。",
+      "evidence": "tests/trainer-intro.test.cjs、tests/audio-results.e2e.cjs、tests/battle-layout.e2e.cjs"
+    },
+    {
+      "title": "每次新队伍自动生成",
+      "status": "已实现并完成针对性验证",
+      "result": "使用当前精确规则的候选组合，通过完整队伍校验后直接填入，可再编辑；连续生成避开上一队。当前公开自组队规则 55/55 通过。",
+      "evidence": "tests/team-generator.test.cjs、tests/starter-ui.e2e.cjs"
+    },
+    {
+      "title": "规则预览与原网页隔离",
+      "status": "已实现并完成针对性验证",
+      "result": "大厅及编辑器可悬停查看当前继承限制；原生弹窗在适配前隐藏，游戏模式不直接嵌入资料网页。",
+      "evidence": "tests/starter-rules.test.cjs、tests/battle-presentation.e2e.cjs"
+    },
+    {
+      "title": "窄窗口与晨光光幕",
+      "status": "已实现并完成针对性验证",
+      "result": "窗口固定 16:10，最小 1152×720；子窗口坐标换算修复；晨光全场背景铺满战场，窄战场使用上下血条。",
+      "evidence": "tests/window-aspect.e2e.cjs、tests/battle-aspect.e2e.cjs、tests/view-bounds.test.cjs"
     }
   ],
-  "verification": "前三项的历史定位包含只读代码检查和 Node 复现脚本；新增三项仅记录用户反馈，尚未验证。此次只更新待办文档，没有实施修复、打包或安装。"
+  "limits": [
+    "未使用真实用户账号进行排位验收；测试为真实 Electron 与本地对战协议回放。",
+    "当前支持范围是随版本提供的规则引擎；不能保证未来未知规则。",
+    "生成器提供合法入门队伍，不承诺竞技胜率。",
+    "部分物种缺少同风格的背面或异色动画，仍使用明确的资源回退。"
+  ]
 }

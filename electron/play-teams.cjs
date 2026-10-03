@@ -20,6 +20,7 @@ function handlers({store,parent,openView,contents,server,logger}){
  const save=p=>{const format=checkFormat(p.format),checked=validate(p.text,format);if(!checked.valid)throw Error(checked.errors.join('\n'));const team={id:p.id||crypto.randomUUID(),name:String(p.name||'我的队伍').slice(0,80),format,positions:p.positions,text:checked.text,members:checked.team.map(m=>({species:m.species,item:m.item,ability:m.ability,moves:m.moves,teraType:m.teraType})),updatedAt:new Date().toISOString()};store.set('teams',[team,...store.get('teams',[]).filter(t=>t.id!==team.id)].slice(0,200));return team;};
  return{
   teams:()=>store.get('teams',[]),
+  'team-generate':p=>runEditor('generate',p),
   'team-editor-data':p=>runEditor('read',p),
   'team-editor-refresh':p=>runEditor('refresh',p),
   'team-editor-update':p=>runEditor('update',p),

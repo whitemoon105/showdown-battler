@@ -1,0 +1,21 @@
+'use strict';
+function installRuleTips({get,name=x=>x}={}){
+ if(window.__dfyRuleTips)return window.__dfyRuleTips;
+ let tip,anchor,timer,revision=0,picker;
+ const node=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls;if(text)n.textContent=text;return n;};
+ function hide(){clearTimeout(timer);revision++;anchor?.removeAttribute('aria-describedby');anchor=null;tip?.remove();tip=null;}
+ function position(){if(!anchor?.isConnected){hide();return;}const r=anchor.getBoundingClientRect(),w=Math.min(350,innerWidth-24);tip.style.width=w+'px';const x=r.right+w+22<=innerWidth?r.right+10:r.left-w-10>=12?r.left-w-10:innerWidth-w-12;tip.style.left=Math.max(12,x)+'px';tip.style.top=Math.max(12,Math.min(r.top,innerHeight-tip.offsetHeight-12))+'px';}
+ async function show(button){hide();anchor=button;const ticket=revision;timer=setTimeout(async()=>{try{const r=await get(button.dataset.ruleFormat);if(ticket!==revision||!button.isConnected)return;tip=node('section','dfy-rule-tip');tip.id='dfy-rule-tip';tip.popover='manual';tip.setAttribute('role','tooltip');tip.append(node('strong','',name(r.name)));const list=node('ul','');for(const line of r.lines)list.append(node('li','',line));tip.append(list);for(const [key,title]of [['bans','禁止项目'],['allows','特例允许']])if(r[key]?.length){tip.append(node('b','',title),node('p','',r[key].join('、')));}tip.append(node('small','',r.note));tip.addEventListener('pointerenter',()=>clearTimeout(timer));tip.addEventListener('pointerleave',()=>timer=setTimeout(hide,120));document.body.append(tip);tip.showPopover();button.setAttribute('aria-describedby',tip.id);position();}catch{if(ticket===revision)hide();}},220);}
+ const enter=e=>{const button=e.target.closest?.('[data-rule-format]');if(button&&button!==anchor)show(button);};
+ const leave=e=>{if(!anchor||!anchor.contains(e.target)||anchor.contains(e.relatedTarget)||tip?.contains(e.relatedTarget))return;clearTimeout(timer);timer=setTimeout(hide,140);};
+ document.addEventListener('pointerover',enter);document.addEventListener('pointerout',leave);document.addEventListener('focusin',enter);document.addEventListener('focusout',leave);document.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();picker?.hidePopover();}});window.addEventListener('resize',()=>{hide();picker?.hidePopover();});
+ function chooseFormats({options,value,onChange,button}){
+  hide();picker?.remove();picker=node('section','dfy-format-picker');picker.popover='manual';picker.setAttribute('aria-label','选择规则，悬停查看说明');const search=node('input','');search.placeholder='搜索世代、单打、双打、分级';search.setAttribute('aria-label','搜索规则');const list=node('div','dfy-format-options');list.setAttribute('role','listbox');
+  for(const o of options){const b=node('button','',o.label);b.type='button';b.dataset.ruleFormat=o.id;b.dataset.search=(o.label+' '+o.id).toLowerCase();b.setAttribute('role','option');b.setAttribute('aria-selected',String(o.id===value));b.onclick=()=>{picker.hidePopover();hide();onChange(o.id);};list.append(b);}
+  search.oninput=()=>{for(const b of list.children)b.hidden=!b.dataset.search.includes(search.value.trim().toLowerCase());};search.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();[...list.children].find(b=>!b.hidden)?.focus();}};
+  picker.append(search,list);document.body.append(picker);picker.showPopover();const r=button.getBoundingClientRect(),width=Math.min(460,innerWidth-24);picker.style.width=width+'px';picker.style.left=Math.max(12,Math.min(r.left,innerWidth-width-12))+'px';picker.style.top=Math.max(12,Math.min(r.bottom+6,innerHeight-picker.offsetHeight-12))+'px';search.focus();const current=picker;current.addEventListener('toggle',()=>{if(picker===current&&!current.matches(':popover-open'))hide();});
+ }
+ document.addEventListener('pointerdown',e=>{if(picker?.matches(':popover-open')&&!picker.contains(e.target)&&!tip?.contains(e.target)&&!e.target.closest('[data-action=team-format-menu]')){picker.hidePopover();hide();}});
+ return window.__dfyRuleTips={hide,chooseFormats};
+}
+if(typeof module!=='undefined')module.exports={install:installRuleTips};else installRuleTips({get:id=>window.play.invoke('rule',{id}).then(r=>r.preview),name:x=>window.__playFormatName?.(x)||x});

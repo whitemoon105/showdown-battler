@@ -1,26 +1,15 @@
 'use strict';
 // A custom game surface around Showdown's animation engine, not its website chrome.
-function install({css='',dictionary={},assetMeta={}}={}){
+function install({css='',dictionary={},assetMeta={},descriptions={}}={}){
  if(window.__dfyDual)return;window.__dfyDual=true;document.body.dataset.dfyPresentation='dual';
  const style=document.createElement('style');style.id='dfy-dual-theme';style.textContent=css;document.head.append(style);
  const el=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls;if(text)n.textContent=text;return n;},zh=t=>dictionary[t]||t||'',id=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]/g,''),set=(n,t)=>{if(n.textContent!==String(t))n.textContent=t;};
- // Replace Showdown's effect player and BGM player, keeping the app's mute control.
- const nativeSound=window.BattleSound;if(nativeSound){const mute=nativeSound.setMute?.bind(nativeSound);mute?.(true);nativeSound.setMute=()=>mute?.(true);nativeSound.playEffect=()=>{};nativeSound.loadBgm=()=>({resume(){},pause(){},stop(){},destroy(){}});}
- const audio=window.__dfyBattleAudio=(()=>{
-  let context,bgm,owner='',duckTimer,master=1;const buffers=new Map(),chosen=new Map(),sources=new Set(),events=[],playlist=Object.keys(assetMeta).filter(k=>k.startsWith('bgm/'));let previous='';
-  const log=(kind,key)=>{events.push({kind,key,at:Date.now()});if(events.length>100)events.shift();};
-  const ctx=()=>context||(context=new AudioContext());
-  const unlock=()=>{if(context?.state==='suspended')context.resume().catch(()=>{});if(bgm?.paused&&owner)bgm.play().catch(()=>{});};document.addEventListener('pointerdown',unlock,{passive:true});
-  async function play(key,volume=.42){if(!assetMeta[key])return;try{const c=ctx();if(c.state!=='running')await c.resume();if(!buffers.has(key))buffers.set(key,fetch('dfy-asset://battle/'+key).then(r=>{if(!r.ok)throw Error('Missing sound');return r.arrayBuffer();}).then(b=>c.decodeAudioData(b)));const buffer=await buffers.get(key);if(buffers.size>36)buffers.delete(buffers.keys().next().value);const source=c.createBufferSource(),gain=c.createGain();source.buffer=buffer;gain.gain.value=volume*master;source.connect(gain);gain.connect(c.destination);if(sources.size>=6)sources.values().next().value.stop();sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();gain.disconnect();};source.start();log('sound',key);const duck=/^audio\/(?:summon|recall|transform)\.wav$/.test(key);if(bgm&&duck){bgm.volume=.13*master;clearTimeout(duckTimer);duckTimer=setTimeout(()=>{if(bgm)bgm.volume=.28*master;},700);}}catch{buffers.delete(key);}}
-  function setVolume(value){master=Math.max(0,Math.min(1,Number(value)||0));if(bgm)bgm.volume=.28*master;return master;}
-  function sync(room,battle,visible){if(!visible||battle.ended||battle.paused||!battle.started){if(owner===room.id){bgm?.pause();owner='';}return;}if(owner===room.id)return;if(!playlist.length)return;bgm?.pause();owner=room.id;let key=chosen.get(owner);if(!key){const options=playlist.filter(k=>k!==previous);key=(options.length?options:playlist)[Math.floor(Math.random()*(options.length||playlist.length))];chosen.set(owner,key);previous=key;}if(!bgm||!bgm.src.endsWith(key)){bgm=new Audio('dfy-asset://battle/'+key);bgm.loop=true;bgm.volume=.28*master;}bgm.play().then(()=>log('bgm',key)).catch(()=>{});}
-  return{play,sync,setVolume,events,stop(room){if(owner===room.id){bgm?.pause();owner='';}},get music(){return{owner,track:bgm?.src,volume:bgm?.volume,master,paused:bgm?.paused,time:bgm?.currentTime,readyState:bgm?.readyState,error:bgm?.error?.message};}};
- })();
+ const audio=window.__dfyBattleAudio=window.__dfyCreateBattleAudio(assetMeta);
  const local=(p,front=true)=>{let species=typeof p==='string'?p:p.getSpeciesForme?.()||p.speciesForme||p.species;if(p.volatiles?.dynamax?.[1]&&!/-Gmax$/i.test(species))species+='-Gmax';const s=Dex.species.get(species);return'dfy-asset://battle/sprite/'+s.id+'/'+(front?'front':'back')+'/'+(p.shiny?'shiny':'normal')+'/'+(p.gender==='F'?'F':'M');};
  // Native teambuilder portraits use CSS backgrounds, independently of battle sprites.
  Dex.getTeambuilderSprite=function(p,dex,xOffset=0,yOffset=0){
   if(!p)return'';const url=local(p),species=Dex.species.get(typeof p==='string'?p:p.species);
-  const meta=assetMeta[url.replace('dfy-asset://battle/','')]||assetMeta['sprite/'+species.id+'/front/normal/M'];
+  const meta=window.__dfySpriteAssetKeys(url.replace('dfy-asset://battle/','')).map(key=>assetMeta[key]).find(Boolean);
   const width=meta?.width||96,height=meta?.height||96,scale=Math.min(90/width,72/height),w=width*scale,h=height*scale;
   return 'background-image:url('+url+');background-position:'+(10+(96-w)/2+xOffset)+'px '+(22+(72-h)/2+yOffset)+'px;background-repeat:no-repeat;background-size:'+w+'px '+h+'px';
  };
@@ -30,9 +19,9 @@ function install({css='',dictionary={},assetMeta={}}={}){
  Dex.getTypeIcon=function(type,b){const index=typeOrder.indexOf(type);if(index<0)return nativeType.call(this,type,b);return'<span class="dfy-native-type" translate="no" title="'+typeLabels[index]+'" style="background-color:'+typeColors[index]+'"><i style="background-position:0 -'+(index*14)+'px"></i>'+typeLabels[index]+'</span>';};
  const oldSprite=Dex.getSpriteData;Dex.getSpriteData=function(p,front,options){
   const data=oldSprite.call(this,p,front,options);if(document.body.dataset.dfyDisplay!=='game')return data;
-  const url=local(p,front),meta=assetMeta[url.replace('dfy-asset://battle/','')],species=Dex.species.get(typeof p==='string'?p:p.getSpeciesForme?.()||p.speciesForme||p.species);
+  const url=local(p,front),meta=window.__dfySpriteAssetKeys(url.replace('dfy-asset://battle/','')).map(key=>assetMeta[key]).find(Boolean),species=Dex.species.get(typeof p==='string'?p:p.getSpeciesForme?.()||p.speciesForme||p.species);
   const near=!front,dynamax=!!p.volatiles?.dynamax&&options?.dynamax!==false;
-  const w=meta?.width||data.w||100,h=meta?.height||data.h||100;
+  const w=meta?.width||32,h=meta?.height||32;
   const dimensions=window.__dfySpriteDimensions({width:w,height:h,heightm:species.heightm,front,gen:data.gen,doubles:p?.side?.active?.length===2,slot:p.slot||0,dynamax});
   return{...data,url,pixelated:false,...dimensions};
  };
@@ -57,6 +46,11 @@ function install({css='',dictionary={},assetMeta={}}={}){
   // Supplemental effects follow public animation events. They never delay a choice or
   // invent a hit/ability from a prediction. Native per-move animation remains intact.
   const fxLayer=el('div','dfy-accent-fx');arena.append(fxLayer);
+  // 保留理由：晨光等全场光幕覆盖实际战场，不能跟随 640×360 精灵镜头露出矩形硬边；原生引擎继续管理动画和清理。
+  let background,backgroundParent,backgroundNext;
+  function restoreBackground(){if(!background)return;background.classList.remove('dfy-move-background');if(backgroundParent?.isConnected)backgroundParent.insertBefore(background,backgroundNext?.parentNode===backgroundParent?backgroundNext:null);else background.remove();background=null;}
+  function fitBackground(){const next=scene.$bgEffect?.[0];if(!next||next===background)return;restoreBackground();background=next;backgroundParent=next.parentNode;backgroundNext=next.nextSibling;next.classList.add('dfy-move-background');arena.insertBefore(next,arena.querySelector('.battle'));}
+  fitBackground();
   const timers=new Set(),animations=new Set(),transformStates=new WeakMap();
   const positioned=new WeakSet();
   function positionSprite(p){
@@ -76,9 +70,9 @@ function install({css='',dictionary={},assetMeta={}}={}){
   function later(fn,delay=0){if(disposed||!scene.animating||scene.acceleration>=3||!arena.getClientRects().length)return;const t=setTimeout(()=>{timers.delete(t);if(!disposed&&scene.animating)fn();},Math.max(0,scene.timeOffset||0)+delay);timers.add(t);}
   function animate(n,frames,duration=650,delay=0){const a=n.animate(frames,{duration:reduced.matches?Math.min(duration,200):duration,delay,easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});animations.add(a);a.finished.catch(()=>{}).finally(()=>{animations.delete(a);n.remove();});return a;}
   function point(p){const sprite=p?.sprite,r=sprite?.$el?.[0]?.getBoundingClientRect(),a=arena.getBoundingClientRect();if(r?.width&&r?.height)return{x:r.x-a.x+r.width/2,y:r.y-a.y+r.height*.58};const scale=Math.min(a.width/640,a.height/360);return{x:(a.width-640*scale)/2+(sprite?.left||320)*scale,y:(a.height-360*scale)/2+(sprite?.top||180)*scale};}
-  function piece(cls,at,color){while(fxLayer.childElementCount>72)fxLayer.firstElementChild.remove();const n=el('i','dfy-fx '+cls);n.style.left=at.x+'px';n.style.top=at.y+'px';n.style.setProperty('--fx-color',color);fxLayer.append(n);return n;}
+  function piece(cls,at,color){while(fxLayer.childElementCount>72)fxLayer.firstElementChild.remove();const n=el('i','dfy-fx '+cls);n.style.left=at.x/arena.clientWidth*100+'%';n.style.top=at.y/arena.clientHeight*100+'%';n.style.setProperty('--fx-color',color);fxLayer.append(n);return n;}
   function ring(at,color,large=false){const n=piece('dfy-fx-ring',at,color);animate(n,[{opacity:0,transform:'translate(-50%,-50%) scale(.2)'},{opacity:.75,offset:.2},{opacity:0,transform:'translate(-50%,-50%) scale('+(large?2.6:1.4)+')'}],large?1050:650);}
-  function sparks(at,color,count=9){if(reduced.matches)return;for(let i=0;i<count;i++){const angle=i/count*Math.PI*2,dist=28+(i%3)*13,n=piece('dfy-fx-spark',at,color);animate(n,[{opacity:0,transform:'translate(-50%,-50%) scale(.4)'},{opacity:.85,offset:.18},{opacity:0,transform:'translate('+Math.cos(angle)*dist+'px,'+(Math.sin(angle)*dist-15)+'px) scale(.1)'}],560+i%3*100);}}
+  function sparks(at,color,count=9){if(reduced.matches)return;for(let i=0;i<count;i++){const angle=i/count*Math.PI*2,dist=(28+(i%3)*13)*Math.min(1.5,Math.max(.65,arena.clientHeight/380)),n=piece('dfy-fx-spark',at,color);animate(n,[{opacity:0,transform:'translate(-50%,-50%) scale(.4)'},{opacity:.85,offset:.18},{opacity:0,transform:'translate('+Math.cos(angle)*dist+'px,'+(Math.sin(angle)*dist-15)+'px) scale(.1)'}],560+i%3*100);}}
   function travel(from,to,color,returning=false){const n=piece('dfy-fx-trail',from,color),dx=to.x-from.x,dy=to.y-from.y,angle=Math.atan2(dy,dx)*180/Math.PI;animate(n,[{opacity:0,transform:'rotate('+angle+'deg) scaleX(.1)'},{opacity:.65,offset:.2},{opacity:0,transform:'translate('+dx+'px,'+dy+'px) rotate('+angle+'deg) scaleX('+(returning?'.2':'1.2')+')'}],returning?480:430);}
   // Showdown owns the single ball and the Pokemon reveal timeline. Add only
   // the opening light and sound at that ball's arrival, never another ball.
@@ -97,10 +91,14 @@ function install({css='',dictionary={},assetMeta={}}={}){
   function cry(p){const num=Dex.species.get(p.getSpeciesForme?.()||p.speciesForme).num;if(num>0)audio.play('cry/'+num+'.ogg',.14);}
   function impact(p,kind){later(()=>{const strong=kind==='super4'||kind==='critical',at=point(p);sound(kind);ring(at,strong?'#ffcf8b':'#ffdcaf',strong);sparks(at,strong?'#ffd996':'#ffedc9',strong?14:8);mark('impact-sound',kind);if(strong&&!reduced.matches){const stage=arena.querySelector('.battle');stage?.animate([{translate:'0 0'},{translate:'-4px 1px'},{translate:'4px -1px'},{translate:'-2px 0'},{translate:'0 0'}],{duration:240});}if(kind!=='hit'){const text=kind==='critical'?'击中要害！':kind==='super4'?'效果拔群 ×4':'效果拔群 ×2',existing=fxLayer.querySelector('.dfy-impact-title');if(existing){if(!existing.textContent.includes(text))existing.textContent+=' · '+text;if(kind==='critical')existing.dataset.kind=kind;return;}const label=el('div','dfy-impact-title',text);label.dataset.kind=kind;fxLayer.append(label);animate(label,[{opacity:0,transform:'translateX(-50%) scale(1.1)'},{opacity:1,transform:'translateX(-50%) scale(1)',offset:.15},{opacity:1,offset:.65},{opacity:0,transform:'translate(-50%,-10px)'}],950);}});}
   function mark(kind,value){evidence.push({kind,name:value,at:Date.now()});if(evidence.length>100)evidence.shift();}
+  const intro=window.__dfyTrainerIntro({room,battle,arena,mark});
   const field=window.__dfyFieldEffects({arena,battle,mark,privateData,zh});
   const choice=window.__dfyBattleChoice({room,battle,command,preview,name,local,zh});
+  const moveInfo=window.__dfyMoveInfo({command,battle,descriptions,zh});
+  const result=window.__dfyBattleResult({room,battle,arena,header:tools,audio,mark});
   function announce(t){set(dialogue,t);}
   function hook(method,fn){const original=scene[method];if(typeof original!=='function')return;const wrapped=function(...args){fn(...args);return original.apply(this,args);};scene[method]=wrapped;hooks.push({method,original,wrapped});}
+  hook('backgroundEffect',fitBackground);
   function mechanic(p,kind){
    if(!scene.animating)return;mark(kind,p.terastallized||name(p));
    const title=({tera:'太晶化',mega:'超级进化',dynamax:'极巨化',zpower:'Ｚ力量'})[kind];
@@ -114,7 +112,7 @@ function install({css='',dictionary={},assetMeta={}}={}){
   for(const side of battle.sides)for(const p of side.pokemon)transformStates.set(p,{tera:p.terastallized,dynamax:!!p.volatiles?.dynamax,forme:p.getSpeciesForme?.()});
   hook('animTransform',p=>{const next={tera:p.terastallized,dynamax:!!p.volatiles?.dynamax,forme:p.getSpeciesForme?.()},old=transformStates.get(p)||{};transformStates.set(p,next);const kind=next.tera&&next.tera!==old.tera?'tera':next.dynamax&&!old.dynamax?'dynamax':/mega/i.test(next.forme||'')&&next.forme!==old.forme?'mega':null;if(kind){mechanic(p,kind);later(()=>{const color=kind==='tera'?'#bdf4ff':kind==='dynamax'?'#f59fc7':'#ceb1ff';ring(point(p),color,true);sparks(point(p),color,14);});}});
   hook('runOtherAnim',(effect,ps)=>{if(effect==='zpower'&&ps[0])mechanic(ps[0],'zpower');});
-  for(const method of ['animSummon','animUnsummon']){const original=scene[method],returning=method==='animUnsummon';const wrapped=function(p,...args){positionSprite(p);if(scene.animating){mark(returning?'switch-out':'summon',name(p));if(!returning)announce('上吧，'+name(p)+'！');}const previous=entranceContext;entranceContext={p,returning};try{return original.call(this,p,...args);}finally{entranceContext=previous;}};scene[method]=wrapped;hooks.push({method,original,wrapped});}
+  for(const method of ['animSummon','animUnsummon']){const original=scene[method],returning=method==='animUnsummon';const wrapped=function(p,...args){positionSprite(p);if(!returning)scene.timeOffset+=intro.start({instant:!!args[1]});if(scene.animating){mark(returning?'switch-out':'summon',name(p));if(!returning)announce('上吧，'+name(p)+'！');}const previous=entranceContext;entranceContext={p,returning};try{return original.call(this,p,...args);}finally{entranceContext=previous;}};scene[method]=wrapped;hooks.push({method,original,wrapped});}
   {const method='showEffect',original=scene[method],wrapped=function(effect,start,end,transition,after,...args){
    if(entranceContext&&(effect==='pokeball'||effect===window.BattleEffects?.pokeball)){
     const {p,returning}=entranceContext,near=p.side===battle.nearSide,data=typeof effect==='string'?window.BattleEffects[effect]:effect;
@@ -155,7 +153,7 @@ function install({css='',dictionary={},assetMeta={}}={}){
      const value=Number(b.dataset.nativeValue),far=action==='chooseMoveTarget'&&value>0,index=action==='chooseMoveTarget'?Math.abs(value)-1:value,p=(far?battle.farSide:battle.nearSide)?.active[index];if(!p)continue;
      const tag=(far?'对方':'我方')+' '+(index+1)+' 号位',key=tag+'|'+name(p);b.dataset.targetSide=far?'far':'near';if(b.dataset.targetKey!==key){b.dataset.targetKey=key;b.replaceChildren();const img=el('img','dfy-target-sprite');img.src=local(p);img.alt='';b.append(img,el('span','dfy-target-position',tag),el('b','dfy-target-name',name(p)));b.setAttribute('aria-label',tag+' '+name(p));}continue;
     }
-    if(action==='chooseMove'){const native=room.el.querySelector('.battle-controls [name=chooseMove][value="'+b.dataset.nativeValue+'"]'),move=battle.dex.moves.get(native?.dataset.move||native?.textContent.split('\n')[0]);if(!move.exists)continue;const active=(battle.farSide?.active||[]).filter(p=>p&&!p.fainted),factors=active.map(p=>typeFactor(move,p)).filter(n=>n!==null),best=factors.length?Math.max(...factors):null,label=best===null?'变化招式':best>1?'效果拔群':best===1?'':best===0?'无效':'效果不佳';let badge=b.querySelector('.dfy-effectiveness');if(!badge){badge=el('span','dfy-effectiveness');b.append(badge);}set(badge,label);badge.hidden=doubles;badge.dataset.effect=best===null?'status':best>1?'super':best===0?'immune':best<1?'resist':'normal';let scope=b.querySelector('.dfy-move-scope');if(doubles){if(!scope){scope=el('span','dfy-move-scope');b.append(scope);}const target=native?.dataset.target||move.target;set(scope,move.id==='allyswitch'?'交换我方位置':({allAdjacent:'全体 · 含队友',allAdjacentFoes:'敌方全体',adjacentAlly:'选择队友',adjacentAllyOrSelf:'我方单体',self:'自身',allySide:'我方场地',foeSide:'对方场地',all:'全场',randomNormal:'随机单体'})[target]||'选择目标');}b.title=zh(move.name)+'\n威力 '+(move.basePower||'—')+' · 命中 '+(move.accuracy===true?'必中':move.accuracy||'—');}
+    if(action==='chooseMove'){const native=room.el.querySelector('.battle-controls [name=chooseMove][value="'+b.dataset.nativeValue+'"]'),move=battle.dex.moves.get(native?.dataset.move||native?.textContent.split('\n')[0]);if(!move.exists)continue;b.dataset.moveId=move.id;const active=(battle.farSide?.active||[]).filter(p=>p&&!p.fainted),factors=active.map(p=>typeFactor(move,p)).filter(n=>n!==null),best=factors.length?Math.max(...factors):null,label=best===null?'变化招式':best>1?'效果拔群':best===1?'':best===0?'无效':'效果不佳';let badge=b.querySelector('.dfy-effectiveness');if(!badge){badge=el('span','dfy-effectiveness');b.append(badge);}set(badge,label);badge.hidden=doubles;badge.dataset.effect=best===null?'status':best>1?'super':best===0?'immune':best<1?'resist':'normal';let scope=b.querySelector('.dfy-move-scope');if(doubles){if(!scope){scope=el('span','dfy-move-scope');b.append(scope);}const target=native?.dataset.target||move.target;set(scope,move.id==='allyswitch'?'交换我方位置':({allAdjacent:'全体 · 含队友',allAdjacentFoes:'敌方全体',adjacentAlly:'选择队友',adjacentAllyOrSelf:'我方单体',self:'自身',allySide:'我方场地',foeSide:'对方场地',all:'全场',randomNormal:'随机单体'})[target]||'选择目标');}b.removeAttribute('title');}
    }
    const toggle=choiceTools.querySelector('[data-native-toggle=terastallize]');if(toggle){const label=toggle.closest('label'),index=Math.min(room.choice?.choices?.length||0,(battle.nearSide?.active?.length||1)-1),p=battle.nearSide?.active?.[index],type=p?teraType(p):room.request?.active?.[index]?.canTerastallize;let caption=label.querySelector('.dfy-tera-choice');if(!caption){for(const n of [...label.childNodes])if(n.nodeType===3)n.remove();caption=el('span','dfy-tera-choice');label.append(caption);}set(caption,'太晶化'+(type?' · '+zh(type):''));}
   }
@@ -165,25 +163,27 @@ function install({css='',dictionary={},assetMeta={}}={}){
    for(const [p,h]of huds)h.node.hidden=!active.has(p);overlay.dataset.double=String((battle.nearSide?.active.length||1)>1);arena.dataset.double=overlay.dataset.double;
    const choosing=(room.request?.teamPreview&&!battle.nearSide?.active.some(Boolean))||(!battle.turn&&!battle.ended&&!battle.nearSide?.active.some(Boolean)&&known.length>0);preview.hidden=!choosing;arena.dataset.preview=String(!!choosing);
    const pk=choosing?key+'|'+(battle.nearSide?.pokemon||[]).map(p=>p.speciesForme).join(','):'';
-   if(pk!==previewKey){const wasChoosing=!!previewKey;previewKey=pk;preview.replaceChildren();
+   if(pk!==previewKey){previewKey=pk;preview.replaceChildren();
     if(choosing){announce(room.request?.teamPreview?'点击下方队伍，选择出场顺序。':'等待训练家选择出场阵容。');preview.append(el('h2','','选择出场阵容'),el('p','','点击自己的宝可梦，按下方位置安排出场顺序'));
      for(const [team,label] of [[battle.nearSide,'我方']]){const block=el('section','dfy-preview-team');block.append(el('b','',label+' · '+(team?.name||'训练家')));const row=el('div','dfy-preview-row');for(const [index,p] of (battle.myPokemon||team?.pokemon||[]).entries()){const fig=el('button','dfy-preview-pick'),img=el('img','');fig.type='button';fig.dataset.previewPokemon=index;img.src=local(p);img.alt=name(p);fig.append(img,el('figcaption','',name(p)));row.append(fig);}block.append(row);preview.append(block);}
-    }else if(wasChoosing&&battle.started&&!battle.ended){const vs=el('div','dfy-entry-title');vs.append(el('small','','准备就绪'),el('b','','对战开始'),el('span','',(battle.nearSide?.name||'我方')+'  VS  '+(battle.farSide?.name||'对手')));fxLayer.append(vs);animate(vs,[{opacity:0,transform:'translateY(20px) scale(.96)'},{opacity:1,transform:'none',offset:.2},{opacity:1,offset:.72},{opacity:0,transform:'translateY(-15px) scale(1.06)'}],1500);mark('battle-entry','对战开始');}
+    }
    }
    const track=audio.music.track?.match(/bgm\/([^/.]+)\.mp3/)?.[1];set(musicLabel,track?'♫ '+(musicTitles[track]||'对战音乐'):'');musicLabel.title='本地音乐 · 音量由应用声音设置控制';
-   audio.sync(room,battle,!!arena.getClientRects().length&&!document.hidden);field.sync();
+   intro.prepare();audio.sync(room,battle,!!arena.getClientRects().length&&!document.hidden);field.sync();
    for(const sideName of ['near','far']){const cards=[...huds.values()].filter(h=>!h.node.hidden&&h.node.dataset.side===sideName).sort((a,b)=>a.node.dataset.slot-b.node.dataset.slot);let offset=12;for(const h of cards){const n=h.node;if(overlay.dataset.double==='true'){n.style.width=Math.min(158,Math.max(128,arena.clientWidth*.23))+'px';n.style.left=sideName==='far'?'12px':'auto';n.style.right=sideName==='near'?'12px':'auto';n.style.top=sideName==='far'?offset+'px':'auto';n.style.bottom=sideName==='near'?offset+'px':'auto';offset+=n.offsetHeight+8;}else for(const prop of ['width','left','right','top','bottom'])n.style.removeProperty(prop);}}
-   if(battle.ended)announce('对战结束');decorateButtons();choice.sync();resize();
+   decorateButtons();choice.sync();moveInfo.sync();const outcome=result.sync(!!arena.getClientRects().length);if(battle.ended)announce(outcome?.label||'对战结束');resize();
   }
   let cameraKey='',bounds=[];
   const resize=()=>{const stage=arena.querySelector('.battle');if(!stage||!arena.clientWidth)return;
+   const compact=arena.clientWidth<700;arena.dataset.compact=String(compact);
    const active=[battle.nearSide,battle.farSide].flatMap(s=>s?.active||[]).filter(p=>p&&!p.fainted),key=active.map(p=>[p.searchid,p.getSpeciesForme?.(),p.slot,!!p.volatiles?.dynamax].join(':')).join('|');
    if(key!==cameraKey){const next=active.map(p=>{const s=p.sprite;if(!s?.sp)return null;const n=scene.pos({x:s.x,y:s.y,z:s.z},s.sp);return {x:n.left,y:n.top,w:n.width,h:n.height};}).filter(Boolean);if(next.length===active.length&&next.every(b=>b.w>0&&b.h>0)){bounds=next;cameraKey=key;}}
    const columns=side=>Math.max(0,...[...huds.values()].filter(h=>!h.node.hidden&&h.node.dataset.side===side).map(h=>h.node.offsetWidth))+26;
-   const camera=window.__dfyBattleCamera({width:arena.clientWidth,height:arena.clientHeight,bounds,leftInset:columns('far'),rightInset:columns('near'),doubles:overlay.dataset.double==='true'});
+   const rows=side=>Math.max(0,...[...huds.values()].filter(h=>!h.node.hidden&&h.node.dataset.side===side).map(h=>h.node.offsetHeight))+24;
+   const camera=window.__dfyBattleCamera({width:arena.clientWidth,height:arena.clientHeight,bounds,leftInset:compact?16:columns('far'),rightInset:compact?16:columns('near'),topInset:compact?rows('far'):0,bottomInset:compact?rows('near'):0,centered:compact,doubles:overlay.dataset.double==='true'});
    stage.style.setProperty('--dual-scale',camera.scale);stage.style.setProperty('--dual-left',camera.left+'px');stage.style.setProperty('--dual-top',camera.top+'px');field.setCamera(camera);
   };const observer=new ResizeObserver(resize);observer.observe(arena);const tick=setInterval(sync,500);sync();resize();
-  return{sync,afterMirror(){decorateButtons();choice.sync();},evidence,field,dispose(){disposed=true;choice.dispose();field.dispose();audio.stop(room);clearInterval(tick);logNode?.removeEventListener('scroll',onLogScroll);for(const t of timers)clearTimeout(t);for(const a of animations)a.cancel();observer.disconnect();for(const h of hooks)if(scene[h.method]===h.wrapped)scene[h.method]=h.original;tools.remove();overlay.remove();fxLayer.remove();dialogue.remove();choiceTools.remove();layout.append(record);sidebar.remove();replayTools.remove();}};
+  return{sync,afterMirror(){decorateButtons();choice.sync();moveInfo.sync();},evidence,field,dispose(){disposed=true;restoreBackground();intro.dispose();moveInfo.dispose();result.dispose();choice.dispose();field.dispose();audio.stop(room);clearInterval(tick);logNode?.removeEventListener('scroll',onLogScroll);for(const t of timers)clearTimeout(t);for(const a of animations)a.cancel();observer.disconnect();for(const h of hooks)if(scene[h.method]===h.wrapped)scene[h.method]=h.original;tools.remove();overlay.remove();fxLayer.remove();dialogue.remove();choiceTools.remove();layout.append(record);sidebar.remove();replayTools.remove();}};
  };
 }
 module.exports={install};

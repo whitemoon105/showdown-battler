@@ -41,7 +41,8 @@ function install({css='',dictionary={},playEdition=false}={}) {
     for(const heading of popup.querySelectorAll('h3')){if(/^(Other|其他)/i.test(heading.textContent))setText(heading,'其他队伍');else if(/ teams$/i.test(heading.textContent))setText(heading,heading.textContent.replace(/ teams$/i,' 队伍'));}
     for(const button of popup.querySelectorAll('[name=teambuilder]'))setText(button,'队伍编辑器');
    }
-   if(formats){const input=popup.querySelector('input[name=search]');if(input)input.placeholder='搜索规则，例如 OU、随机对战';}
+   if(formats){const input=popup.querySelector('input[name=search]');if(input)input.placeholder='搜索规则，悬停查看限制';for(const b of popup.querySelectorAll('[name=selectFormat]'))b.dataset.ruleFormat=b.value;}
+   for(const b of document.querySelectorAll('.dfy-pm-window button[name=format]'))b.dataset.ruleFormat=b.value;
    if(prompt){prompt.placeholder='输入训练家名称';prompt.setAttribute('aria-label','训练家名称');const submit=popup.querySelector('[type=submit]');if(submit)setText(submit,'查找');}
    for(const button of popup.querySelectorAll('button[name]'))if(labels[button.name])setText(button,labels[button.name]);
   }
